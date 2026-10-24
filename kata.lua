@@ -28,7 +28,7 @@ local M = {}
 
 -- ── Config ──────────────────────────────────────────────────────────────
 local config = {
-  prefix = "<leader>k", -- next = n, skip = s, prev = p, reset = r, copy = w, run = x, claude = c, editor = e, quit = q
+  prefix = "<leader>k", -- next = n, prev = p, goto = g, reset = r, copy = w, run = x, claude = c, editor = e, quit = q
   to_claude_key = "<M-c>", -- editor (normal/insert) → Claude pane in insert mode
   to_editor_key = "<M-e>", -- Claude pane (terminal mode) → back to the editor
   tmp_root = "/tmp/nkata",
@@ -211,6 +211,19 @@ local function solved_count()
     end
   end
   return n
+end
+
+-- query: a number ("2"), or a name prefix ("002" / "002-todo") → index, or nil
+local function find_kata(query)
+  local n = tonumber(query)
+  if n and S.katas[n] then
+    return n
+  end
+  for i, k in ipairs(S.katas) do
+    if k.name:sub(1, #query) == query then
+      return i
+    end
+  end
 end
 
 -- ── Highlights ──────────────────────────────────────────────────────────
@@ -481,7 +494,7 @@ local function render()
   end
   add("")
   add(rule, "KataDim")
-  add(string.format(" %sn next   %ss skip   %sp previous", p, p, p), "KataDim")
+  add(string.format(" %sn next   %sp previous   %sg go to", p, p, p), "KataDim")
   add(string.format(" %sr reset   %sw copy to…   %sx run in shell", p, p, p), "KataDim")
   add(string.format(" %sc Claude   %se editor   %sq quit", p, p, p), "KataDim")
   add(string.format(" %s to Claude · %s back to editor", config.to_claude_key, config.to_editor_key), "KataDim")
@@ -664,19 +677,6 @@ end
 
 -- ── Actions ─────────────────────────────────────────────────────────────
 function M.next()
-  local k = S.katas[S.idx]
-  if not (S.passed or S.progress.completed[k.name]) then
-    notify("Not passed yet — match the final result first (" .. config.prefix .. "s skips)", vim.log.levels.WARN)
-    return
-  end
-  if S.idx >= #S.katas then
-    notify("That was the last kata in this set")
-    return
-  end
-  load_kata(S.idx + 1, true)
-end
-
-function M.skip()
   if S.idx >= #S.katas then
     notify("Already on the last kata")
     return
@@ -690,6 +690,33 @@ function M.prev()
     return
   end
   load_kata(S.idx - 1, true)
+end
+
+-- Jump to any kata by number or name prefix. `query` is optional:
+-- :KataGoto <query> skips the prompt.
+function M.go_to(query)
+  local function go(input)
+    input = input and vim.trim(input) or ""
+    if input == "" then
+      return -- prompt cancelled
+    end
+    local idx = find_kata(input)
+    if not idx then
+      notify("No kata matches '" .. input .. "'", vim.log.levels.WARN)
+      return
+    end
+    if idx == S.idx then
+      notify("Already on kata " .. idx)
+      return
+    end
+    load_kata(idx, true)
+  end
+
+  if query and query ~= "" then
+    go(query)
+    return
+  end
+  vim.ui.input({ prompt = string.format("Go to kata (1-%d): ", #S.katas) }, go)
 end
 
 function M.reset()
@@ -952,8 +979,8 @@ local function setup_keymaps()
   local p = config.prefix
   local maps = {
     { "n", M.next, "Kata: next" },
-    { "s", M.skip, "Kata: skip" },
     { "p", M.prev, "Kata: previous" },
+    { "g", M.go_to, "Kata: go to kata by number" },
     { "r", M.reset, "Kata: reset editor" },
     { "c", M.claude, "Kata: focus/restart Claude" },
     { "e", M.editor, "Kata: back to editor" },
@@ -979,8 +1006,10 @@ local function setup_keymaps()
     { desc = "Kata: back to editor", silent = true })
 
   api.nvim_create_user_command("KataNext", M.next, {})
-  api.nvim_create_user_command("KataSkip", M.skip, {})
   api.nvim_create_user_command("KataPrev", M.prev, {})
+  api.nvim_create_user_command("KataGoto", function(o)
+    M.go_to(o.args)
+  end, { nargs = "?" })
   api.nvim_create_user_command("KataReset", M.reset, {})
   api.nvim_create_user_command("KataClaude", M.claude, {})
   api.nvim_create_user_command("KataEditor", M.editor, {})
@@ -1021,14 +1050,9 @@ end
 -- start_at: a number ("2"), a name prefix ("002" / "002-todo"), or nil → first unsolved
 local function pick_start(start_at)
   if start_at and start_at ~= "" then
-    local n = tonumber(start_at)
-    if n and S.katas[n] then
-      return n
-    end
-    for i, k in ipairs(S.katas) do
-      if k.name:sub(1, #start_at) == start_at then
-        return i
-      end
+    local idx = find_kata(start_at)
+    if idx then
+      return idx
     end
     notify("No kata matches '" .. start_at .. "', resuming instead", vim.log.levels.WARN)
   end

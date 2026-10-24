@@ -66,9 +66,9 @@ nkata --help
 
 | Keys | Action |
 | --- | --- |
-| `<leader>kn` | Next kata (only once the current one is solved) |
-| `<leader>ks` | Skip to the next kata |
+| `<leader>kn` | Next kata |
 | `<leader>kp` | Previous kata |
+| `<leader>kg` | Go to a kata by number or name prefix (you're prompted) |
 | `<leader>kr` | Reset the editor to blank or the starter text |
 | `<leader>kw` | Write a copy of the editor to a path you type (see below) |
 | `<leader>kx` | Run the visually selected text (or, in normal mode, the current line) in your shell |
@@ -78,7 +78,7 @@ nkata --help
 | `<M-c>` | From the editor (normal or insert mode): into Claude, ready to type |
 | `<M-e>` | From inside Claude (terminal mode): straight back to the editor |
 
-The same actions exist as commands: `:KataNext`, `:KataSkip`, `:KataPrev`,
+The same actions exist as commands: `:KataNext`, `:KataPrev`, `:KataGoto [n]`,
 `:KataReset`, `:KataCopy [path]`, `:KataRun [cmd]`, `:KataClaude`, `:KataEditor`,
 `:KataQuit`.
 
