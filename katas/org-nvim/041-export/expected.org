@@ -1,0 +1,8 @@
+#+TITLE: Launch notes
+#+AUTHOR: Vishal
+#+OPTIONS: toc:nil num:nil
+* Launch notes
+Some notes worth sharing.
+** Ideas
+- Write a blog post
+- Record a demo

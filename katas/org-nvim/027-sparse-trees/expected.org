@@ -1,0 +1,8 @@
+* Plan the offsite :work:
+** Book a room
+** Order lunch :home:
+* Repaint the kitchen :home:
+** Buy paint
+* TODO [#A] Quarterly report :work:
+* TODO [#A] Fix the bike
+* TODO [#A] Pay the electrician :work:

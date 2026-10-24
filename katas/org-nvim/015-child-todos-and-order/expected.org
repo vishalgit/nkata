@@ -1,0 +1,10 @@
+* TODO Plan the trip [3/3]
+** DONE Book the flights
+** DONE Reserve the hotel
+** DONE Plan the itinerary
+* TODO Ordered steps
+:PROPERTIES:
+:ORDERED: t
+:END:
+** TODO Step one
+** TODO Step two

@@ -1,0 +1,18 @@
+* Babel
+#+begin_src lua
+return 6 * 9
+#+end_src
+
+#+RESULTS:
+: 54
+
+#+begin_src sh :results output
+echo "hello from the shell"
+#+end_src
+
+#+RESULTS:
+: hello from the shell
+
+#+begin_src python :results output
+print(sum(range(101)))
+#+end_src

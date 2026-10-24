@@ -1,0 +1,10 @@
+* Packing
+- [ ] Pack for the trip [0/3] [0%]
+  - [ ] Passport
+  - [ ] Charger
+  - [ ] Toothbrush
+
+* Checklist on a headline [0/3]
+- [ ] Draft the outline
+- [ ] Add examples
+- [ ] Proofread

@@ -1,0 +1,5 @@
+#+TAGS: work(w) home(h) { @office(o) @remote(r) } urgent(u) project(p)
+* Plan the offsite :work:project:
+** Book a room :@remote:
+** Send the agenda :urgent:
+** Order lunch :urgent:

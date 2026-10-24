@@ -1,0 +1,7 @@
+* Links
+** Web
+[[https://orgmode.org][the Org manual]]
+** Heading
+[[*Tables][the tables]]
+* Tables
+Some tables live here.

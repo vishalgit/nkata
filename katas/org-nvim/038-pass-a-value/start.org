@@ -1,0 +1,9 @@
+* Pipes
+#+NAME: my-number
+#+begin_src lua
+return 21
+#+end_src
+
+#+begin_src lua :var n=my-number
+return n * 2
+#+end_src

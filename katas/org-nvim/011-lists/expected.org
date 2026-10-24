@@ -1,0 +1,11 @@
+* Lists
++ dash
++ another dash
+
+1. third
+2. first
+3. second
+
+- Org :: a plain-text outliner
+- Neovim :: an editor you already love
+- org.nvim :: both of the above

@@ -1,0 +1,6 @@
+* TODO Kick-off call
+SCHEDULED: <2027-01-08 Fri>
+* TODO Quarterly review
+SCHEDULED: <2027-03-01 Mon 14:00>
+* TODO Workshop
+SCHEDULED: <2027-03-15 Mon 10:00-11:30>

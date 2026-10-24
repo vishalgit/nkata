@@ -1,0 +1,15 @@
+* Pipes
+#+NAME: my-number
+#+begin_src lua
+return 50
+#+end_src
+
+#+RESULTS: my-number
+: 50
+
+#+begin_src lua :var n=my-number
+return n * 2
+#+end_src
+
+#+RESULTS:
+: 100

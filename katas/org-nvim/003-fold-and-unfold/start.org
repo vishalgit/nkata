@@ -1,0 +1,15 @@
+#+STARTUP: overview
+* Fold practice
+** Level 2
+Some body text belongs to the headline above it.
+*** Level 3
+**** Level 4
+Headlines can go as deep as you like.
+***** Level 5
+** Another level 2
+:PROPERTIES:
+:NOTE: fold just this drawer with Tab
+:END:
+** Old notes :ARCHIVE:
+Archived subtrees stay folded when you open their parent.
+Secret word: hidden

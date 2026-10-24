@@ -1,0 +1,4 @@
+#+TODO: TODO(t) NEXT(n) WAITING(w) | DONE(d) CANCELLED(c)
+* TODO Cycle my state
+* TODO Write the report
+* TODO Old idea

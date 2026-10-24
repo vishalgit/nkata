@@ -1,0 +1,14 @@
+* Keys in an org buffer
+- Schedule a task ::
+- Set a deadline ::
+- Capture ::
+- Open the agenda ::
+- Clock in ::
+- Clock out ::
+- Refile ::
+- Archive ::
+* Keys in the agenda
+- Day view ::
+- Week view ::
+- Follow mode ::
+- Quit ::

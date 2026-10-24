@@ -1,0 +1,6 @@
+* TODO Water the plants
+SCHEDULED: <2026-10-08 Thu +3d>
+* TODO Weekly review
+SCHEDULED: <2026-10-12 Mon +1w>
+* TODO Pay rent
+DEADLINE: <2026-12-01 Tue +1m>

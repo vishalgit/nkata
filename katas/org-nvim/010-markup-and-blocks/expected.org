@@ -1,0 +1,13 @@
+* Markup
+Type the styled sentence here:
+*bold* /italic/ _underline_ =verbatim= ~code~ +strike+
+
+Wrap this word: *important*
+
+#+begin_quote
+Plain text lasts forever.
+#+end_quote
+
+#+begin_example
+Shown exactly as typed.
+#+end_example

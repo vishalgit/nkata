@@ -1,0 +1,5 @@
+* Dates
+Meeting with the designers <2026-10-07 Wed 15:00>
+** Active date
+** Inactive date
+** Date with time

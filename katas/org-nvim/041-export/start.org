@@ -1,0 +1,5 @@
+* Launch notes
+Some notes worth sharing.
+** Ideas
+- Write a blog post
+- Record a demo

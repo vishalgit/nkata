@@ -1,0 +1,7 @@
+* Food
+** Fruit
+** Vegetables
+*** Carrots
+** Grains
+** TODO Buy rice
+* Drinks

@@ -1,0 +1,5 @@
+* TODO Dentist appointment
+* TODO Submit the tax return
+DEADLINE: <2026-10-15 Thu -10d>
+* TODO Something to plan
+SCHEDULED: <2026-10-30 Fri> DEADLINE: <2026-11-06 Fri>

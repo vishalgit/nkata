@@ -1,0 +1,8 @@
+* TODO Email the landlord
+SCHEDULED: <2026-10-26 Mon>
+* TODO Dentist appointment
+SCHEDULED: <2026-10-26 Mon 15:00>
+* TODO [#B] Review the pull request
+SCHEDULED: <2026-10-26 Mon>
+* TODO Buy groceries
+SCHEDULED: <2026-10-26 Mon>

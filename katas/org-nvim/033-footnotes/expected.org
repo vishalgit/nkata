@@ -1,0 +1,6 @@
+* Footnotes
+Org is old and wise[fn:1], and also easy to extend[fn:2].
+
+[fn:1] Org mode was born in Emacs.
+
+[fn:2] It runs on Neovim too.

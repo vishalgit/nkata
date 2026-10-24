@@ -1,0 +1,11 @@
+* Packing
+- [-] Pack for the trip [3/4] [75%]
+  - [X] Passport
+  - [X] Charger
+  - [X] Toothbrush
+  - [ ] Adapter
+
+* Checklist on a headline [2/3]
+- [X] Draft the outline
+- [ ] Add examples
+- [X] Proofread

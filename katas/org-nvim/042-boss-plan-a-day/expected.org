@@ -1,0 +1,24 @@
+#+TODO: TODO(t) NEXT(n) WAITING(w) | DONE(d) CANCELLED(c)
+* TODO [#A] Launch the side project [1/4] :project:
+** DONE Write the landing page
+** TODO Record the demo
+DEADLINE: <2026-11-06 Fri>
+** TODO Plan the launch [2/4]
+SCHEDULED: <2026-11-02 Mon 10:00>
+:PROPERTIES:
+:Effort: 2:00
+:END:
+- [X] Pick a date
+- [X] Draft the post
+- [ ] Tell friends
+- [ ] Post on forums
+** TODO Post a teaser
+* Budget
+| Item    | Cost |
+|---------+------|
+| Domain  |   12 |
+| Hosting |   60 |
+| Design  |   90 |
+|---------+------|
+| Total   |  162 |
+#+TBLFM: @>$2=vsum(@I..@II)

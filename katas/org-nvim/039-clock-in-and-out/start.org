@@ -1,0 +1,4 @@
+* NEXT Write the blog post :work:
+:PROPERTIES:
+:Effort: 1:30
+:END:

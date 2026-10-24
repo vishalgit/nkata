@@ -1,0 +1,5 @@
+* DONE An old task
+CLOSED: [2026-09-20 Sun 10:00]
+* Old notes
+Keep these, but hide them.
+* Current work

@@ -1,0 +1,7 @@
+* Reading list
+* Books
+** [#A] Structure and Interpretation of Computer Programs
+** [#B] Crafting Interpreters
+** [#C] The Pragmatic Programmer
+* Shopping
+- milk

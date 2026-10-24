@@ -1,0 +1,18 @@
+* TODO Standup :work:
+SCHEDULED: <2026-10-05 Mon 09:30 ++1d>
+* Lunch with Sam
+<2026-10-05 Mon 12:30-13:30>
+* Conference
+<2026-10-12 Mon>--<2026-10-14 Wed>
+* TODO Renew the passport :home:
+DEADLINE: <2026-10-09 Fri>
+* TODO Run 5k :habit:
+SCHEDULED: <2026-10-05 Mon .+2d/3d>
+:PROPERTIES:
+:STYLE: habit
+:END:
+* Answers
+- When is lunch with Sam? ::
+- On 2026-10-13 the conference shows ::
+- The task with a habit graph ::
+- Open TODOs in the t list ::

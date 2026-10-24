@@ -1,0 +1,15 @@
+#+TODO: TODO(t) NEXT(n) WAITING(w) | DONE(d) CANCELLED(c)
+* Work
+** NEXT [#A] Fix the login bug :work:urgent:
+** TODO Write the release notes :work:
+** DONE Ship version 1.0 :work:
+** WAITING Answer from legal :work:
+* Home
+** TODO [#A] Call the plumber :home:
+** NEXT Water the plants :home:
+* Answers
+- +work-urgent ::
+- +work/NEXT ::
+- +work/! ::
+- PRIORITY="A" ::
+- home ::

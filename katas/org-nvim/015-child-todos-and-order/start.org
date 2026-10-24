@@ -1,0 +1,7 @@
+* TODO Plan the trip [0/3]
+** TODO Book the flights
+** TODO Reserve the hotel
+** TODO Plan the itinerary
+* TODO Ordered steps
+** TODO Step one
+** TODO Step two

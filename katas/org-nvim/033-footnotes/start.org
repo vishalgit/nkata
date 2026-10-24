@@ -1,0 +1,4 @@
+* Footnotes
+Org is old and wise[fn:1], and also easy to extend.
+
+[fn:1] Org mode was born in Emacs.

@@ -1,0 +1,27 @@
+* Numbers
+| n | square | running total | odd? | label  |
+|---+--------+---------------+------+--------|
+| 1 |      1 |             1 |    1 | item-1 |
+| 2 |      4 |             3 |    0 | item-2 |
+| 3 |      9 |             6 |    1 | item-3 |
+| 4 |     16 |            10 |    0 | item-4 |
+#+TBLFM: $2=$1^2::$3=vsum(@I$1..@0$1)::$4=if(mod($1, 2) == 1, 1, 0)::$5='(string.format("item-%d", $1))
+
+| Task    | Start | End   | Duration |
+|---------+-------+-------+----------|
+| Emails  | 09:00 | 09:40 |     0:40 |
+| Coding  | 09:40 | 12:30 |     2:50 |
+| Meeting | 13:00 | 13:45 |     0:45 |
+#+TBLFM: $4=$3-$2;U
+
+#+NAME: prices
+| Fruit  | Price |
+|--------+-------|
+| Apple  |  0.50 |
+| Banana |  0.25 |
+
+| Order   | Amount | Total |
+|---------+--------+-------|
+| Apples  |     12 |  6.00 |
+| Bananas |      6 |  1.50 |
+#+TBLFM: @2$3=$2*remote(prices, @2$2);%.2f::@3$3=$2*remote(prices, @3$2);%.2f
