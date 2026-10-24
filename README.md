@@ -1,0 +1,212 @@
+# nkata
+
+A 4-pane kata runner for Neovim with a Claude Code coach. You type into the
+editor until it matches the final result, then move on to the next kata.
+
+```
+┌────────────────┬────────────────┐
+│ 1 Editor       │ 3 Instruction  │
+│                │   + status     │
+├────────────────┼────────────────┤
+│ 2 Final result │ 4 Claude Code  │
+│   (read-only)  │   (terminal)   │
+└────────────────┴────────────────┘
+```
+
+All four panes are kept the same size. When your terminal or Neovim window is
+resized, the grid re-equalizes.
+
+## Requirements
+
+- Neovim 0.10 or newer
+- A Neovim profile at `~/.config/kickstart/`. nkata starts Neovim with
+  `NVIM_APPNAME=kickstart`, the same as a `kvim` alias would.
+- `~/.local/bin` on your `PATH`
+- [Claude Code](https://code.claude.com/docs/en/overview) (`claude` on your
+  `PATH`) for pane 4. Without it, the other three panes work as normal and
+  pane 4 says Claude wasn't found.
+
+## Installation
+
+From the folder you extracted:
+
+```bash
+./install.sh
+```
+
+This installs:
+
+| Path | What it is |
+| --- | --- |
+| `~/.local/bin/nkata` | Launcher |
+| `~/.config/nkata/kata.lua` | Runner |
+| `~/katas/org-basics/` | Sample org.nvim kata set |
+
+Each kata set is copied only if `~/katas` doesn't already have one with that
+name, so running `install.sh` again updates the launcher and runner but never
+overwrites your sets or their progress.
+
+If `~/.local/bin` isn't on your `PATH`, the installer tells you. Add this to
+your shell config:
+
+```bash
+export PATH="$HOME/.local/bin:$PATH"
+```
+
+## Usage
+
+```bash
+nkata ~/katas/org-basics        # resume at the first unsolved kata
+nkata ~/katas/org-basics 2      # start at kata #2
+nkata ~/katas/org-basics 003    # start at the kata whose folder starts with 003
+nkata --help
+```
+
+### Keymaps
+
+| Keys | Action |
+| --- | --- |
+| `<leader>kn` | Next kata (only once the current one is solved) |
+| `<leader>ks` | Skip to the next kata |
+| `<leader>kp` | Previous kata |
+| `<leader>kr` | Reset the editor to blank or the starter text |
+| `<leader>kw` | Write a copy of the editor to a path you type (see below) |
+| `<leader>kx` | Run the visually selected text (or, in normal mode, the current line) in your shell |
+| `<leader>kc` | Jump into the Claude pane (restarts Claude if it has exited) |
+| `<leader>ke` | Jump back to the editor |
+| `<leader>kq` | Save progress and quit |
+| `<M-c>` | From the editor (normal or insert mode): into Claude, ready to type |
+| `<M-e>` | From inside Claude (terminal mode): straight back to the editor |
+
+The same actions exist as commands: `:KataNext`, `:KataSkip`, `:KataPrev`,
+`:KataReset`, `:KataCopy [path]`, `:KataRun [cmd]`, `:KataClaude`, `:KataEditor`,
+`:KataQuit`.
+
+### Running a command from the editor
+
+Select text in any pane (`v`, `V` or `Ctrl-v`) and press `<leader>kx`. The
+selection runs in your shell (`'shell'`, normally `$SHELL`), from the folder you
+launched nkata in. In normal mode, `<leader>kx` runs the line under the cursor.
+
+- A multi-line selection runs as one script, so `cd`, variables and
+  pipes carry from line to line.
+- Output streams into a floating window as the command runs. stderr shows in
+  red, and the last line shows the exit code (green for 0).
+- `q` or `Esc` closes the window. If the command is still running, closing
+  the window stops it.
+- `:KataRun ls -la` runs a command you type; `:'<,'>KataRun` runs a line range.
+
+The command runs non-interactively (no stdin), so commands that wait for input
+see end-of-file. Use the Claude pane or a real terminal for interactive commands.
+
+### Copying your attempt out
+
+`<leader>kw` asks `Copy editor to:` with a path pre-filled as
+`<current folder>/<kata-name>.<ext>`. Edit it (Tab completes paths), press
+Enter, and whatever is in the editor pane right now is written there, saved
+or not.
+
+- `~` is expanded and missing parent folders are created.
+- A path ending in `/`, or an existing folder, gets the default
+  `<kata-name>.<ext>` file name.
+- If the file already exists you're asked before it's overwritten.
+- `Esc` or an empty path cancels.
+
+The editor keeps working on its own scratch file, so the copy doesn't change
+the kata. `:KataCopy ~/notes/headings.org` does the same without the prompt.
+
+The `<leader>k…` keymaps are normal-mode only. Inside the Claude pane you're in
+terminal mode, where `<leader>` is typed into Claude, so use `<M-e>` to get
+back. Change the two Alt keys with `to_claude_key` / `to_editor_key` at the top
+of `kata.lua`; avoid keys Claude Code uses itself, such as `Esc`, `Ctrl-c`,
+`Ctrl-d` and `Ctrl-r`.
+
+### The Claude pane
+
+Claude Code starts once per session in pane 4, with the kata set folder as its
+working directory, and keeps the same conversation as you move between katas.
+
+- **It knows the current kata.** nkata keeps a small file describing the
+  current kata and its file paths, and gives Claude standing rules to read it
+  before answering. When you switch katas, nkata types a one-line
+  `[nkata] Now on kata …` notice into Claude so it catches up.
+- **Hints, not answers.** Claude can compare your attempt with the final
+  result, but gives nudges unless you explicitly ask for the answer.
+- **Saving a good hint.** Ask "save that hint" (or similar). Claude adds it as
+  a bullet under `## Help` in the kata's `instruction.md`. Pane 3 updates
+  straight away and the hint is there every time you run that kata.
+- **Editing katas.** Claude may change the current kata's `instruction.md`,
+  `expected.*` and `start.*`. Panes 2 and 3 refresh as soon as the files change
+  on disk; a new starter applies on the next `<leader>kr`. Claude is told not
+  to touch other katas, `.progress.json` or your attempt unless you ask.
+
+Each kata-switch notice is a short message to Claude, so it uses a little of
+your usage. Turn it off with `notify_claude_on_switch = false` in `kata.lua`;
+Claude still re-reads the current kata whenever you ask it something.
+
+### How a kata passes
+
+The editor is compared with the final result as you type. Trailing spaces and
+trailing blank lines don't count. When they match, pane 3 shows a green
+PASSED banner with your time and the separators turn green.
+
+Progress is saved to `.progress.json` inside each kata set. Relaunching
+resumes at the first unsolved kata.
+
+## Writing your own katas
+
+A kata set is any folder of kata folders. They run in folder-name order.
+
+```
+~/katas/my-set/
+  001-first/
+    instruction.md     required — shown in pane 3
+    expected.rs        required — the final result; the extension sets the filetype
+    start.rs           optional — starter text for the editor (blank if absent)
+  002-second/
+    ...
+```
+
+## Configuration
+
+| Setting | Where | Default |
+| --- | --- | --- |
+| Neovim profile | `NKATA_NVIM_APPNAME` env var | `kickstart` |
+| Runner location | `NKATA_HOME` env var | `~/.config/nkata` |
+| Claude command | `NKATA_CLAUDE_CMD` env var, or `claude_cmd` in `kata.lua` | `claude` |
+| Kata-switch notices to Claude | `notify_claude_on_switch` in `kata.lua` | on |
+| Keymap prefix | `prefix` at the top of `kata.lua` | `<leader>k` |
+| Pane-hop keys | `to_claude_key` / `to_editor_key` in `kata.lua` | `<M-c>` / `<M-e>` |
+| Scratch file folder | `tmp_root` at the top of `kata.lua` | `/tmp/nkata` |
+| Pass/fail colours | `pass_color` / `fail_color` in `kata.lua` | green / red |
+
+While nkata is running, `vim.g.kata_mode` is set before your `init.lua` loads.
+Your config can check it to skip dashboards or session restore:
+
+```lua
+if not vim.g.kata_mode then
+  -- dashboard / session plugins here
+end
+```
+
+## Uninstallation
+
+```bash
+./uninstall.sh
+```
+
+This removes:
+
+| Path | What it is |
+| --- | --- |
+| `~/.local/bin/nkata` | Launcher |
+| `~/.config/nkata/` | Runner |
+| `/tmp/nkata/` | Editor scratch files and Claude session files from past sessions |
+
+Your kata lessons in `~/katas`, including `org-basics` and every
+`.progress.json`, are left untouched. To remove those as well, delete them by
+hand:
+
+```bash
+rm -rf ~/katas/org-basics
+```

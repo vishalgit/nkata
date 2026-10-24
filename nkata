@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+# nkata — open a kata set in the 4-pane Neovim kata runner
+#
+# Usage: nkata <set-dir> [start-at]
+#   nkata ~/katas/org-basics          resume at the first unsolved kata
+#   nkata ~/katas/org-basics 2        start at kata #2
+#   nkata ~/katas/org-basics 003      start at the kata whose folder starts with 003
+#
+# Runs your kickstart profile (same as the `kvim` alias) — aliases aren't
+# visible inside scripts, so the env var is set here directly.
+# Override with NKATA_NVIM_APPNAME=<profile>.
+
+set -euo pipefail
+
+KATA_HOME="${NKATA_HOME:-$HOME/.config/nkata}"
+APPNAME="${NKATA_NVIM_APPNAME:-kickstart}"
+
+if [[ $# -lt 1 || "$1" == "-h" || "$1" == "--help" ]]; then
+  sed -n '2,11p' "$0" | sed 's/^# \{0,1\}//'
+  exit 0
+fi
+
+set_dir="$1"
+if [[ ! -d "$set_dir" ]]; then
+  echo "nkata: '$set_dir' is not a directory" >&2
+  exit 1
+fi
+if [[ ! -f "$KATA_HOME/kata.lua" ]]; then
+  echo "nkata: runner not found at $KATA_HOME/kata.lua (run install.sh)" >&2
+  exit 1
+fi
+
+export KATA_SET="$(cd "$set_dir" && pwd)"
+export KATA_START="${2:-}"
+
+# g:kata_mode is set *before* your init.lua, so your config can check
+# `if vim.g.kata_mode then ... end` to skip dashboards/session restore.
+exec env NVIM_APPNAME="$APPNAME" nvim --cmd "let g:kata_mode = 1" -S "$KATA_HOME/kata.lua"
