@@ -1,0 +1,29 @@
+// ─── Mixins ──────────────────────────────────────────────────────
+@use 'sass:map';
+@use 'tokens';
+@use 'functions' as *;
+
+/// Mobile-first media query: the styles apply from this breakpoint up.
+@mixin from($bp) {
+  @if not map.has-key(tokens.$breakpoints, $bp) {
+    @error 'Unknown breakpoint `#{$bp}`.';
+  }
+  @media (min-width: map.get(tokens.$breakpoints, $bp)) {
+    @content;
+  }
+}
+
+/// Keyboard-only focus outline in the brand color.
+@mixin focus-ring {
+  &:focus-visible {
+    outline: 2px solid clr('brand');
+    outline-offset: 2px;
+  }
+}
+
+/// Transition only the listed properties, with the shared duration.
+@mixin transition($props...) {
+  transition-property: $props;
+  transition-duration: tokens.$duration;
+  transition-timing-function: ease-out;
+}

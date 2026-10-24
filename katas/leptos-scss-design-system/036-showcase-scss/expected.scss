@@ -1,0 +1,80 @@
+// ─── Showcase page ───────────────────────────────────────────────
+// pages/ holds rules for one page only. Nothing here is reusable;
+// if it becomes reusable, it moves to components/ or layout/.
+@use '../abstracts' as *;
+
+.showcase {
+  display: flex;
+  flex-direction: column;
+  gap: space(12);
+  padding-block: space(8);
+
+  &__section {
+    display: flex;
+    flex-direction: column;
+    gap: space(4);
+  }
+
+  &__note {
+    margin-top: space(1);
+    color: clr('text-muted');
+  }
+
+  &__swatches {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(8rem, 1fr));
+    gap: space(3);
+  }
+
+  &__swatch {
+    display: flex;
+    flex-direction: column;
+    gap: space(1);
+    font-size: text-size('xs');
+  }
+
+  &__chip {
+    height: 3rem;
+    border: 1px solid clr('border');
+    border-radius: radius('md');
+  }
+
+  &__scroll {
+    overflow-x: auto;
+  }
+
+  &__matrix {
+    border-collapse: collapse;
+
+    th,
+    td {
+      padding: space(2);
+      text-align: start;
+    }
+
+    thead th {
+      color: clr('text-muted');
+      font-size: text-size('xs');
+      text-transform: uppercase;
+    }
+
+    tbody th {
+      font-family: var(--font-mono);
+      font-size: text-size('sm');
+      font-weight: 400;
+    }
+  }
+
+  &__cards {
+    display: grid;
+    gap: space(4);
+
+    @include from('md') {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  &__form {
+    max-width: 28rem;
+  }
+}

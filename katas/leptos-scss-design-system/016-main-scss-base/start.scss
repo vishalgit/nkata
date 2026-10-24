@@ -1,0 +1,14 @@
+// ─── 7-1 entry point ─────────────────────────────────────────────
+// Seven folders, one file. This file only loads folders; it has no rules.
+//
+//   abstracts/   tokens, functions, mixins: compile-time only, no CSS
+//   vendors/     third-party CSS you never edit
+//   base/        element defaults + CSS custom properties
+//   layout/      page structure: app shell, container, header, stack
+//   components/  one partial per UI component (one BEM block each)
+//   pages/       rules that belong to a single page
+//   themes/      other values for the same custom properties
+//
+// Order matters: most general first, most specific last.
+// abstracts is never loaded here. It emits nothing; every partial
+// that needs it writes `@use '../abstracts' as *;` itself.

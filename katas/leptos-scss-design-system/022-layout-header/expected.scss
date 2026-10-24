@@ -1,0 +1,21 @@
+@use '../abstracts' as *;
+
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: clr('surface');
+  border-bottom: 1px solid clr('border');
+
+  &__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 3.5rem;
+  }
+
+  &__brand {
+    font-weight: 700;
+    font-size: text-size('lg');
+  }
+}

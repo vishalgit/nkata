@@ -1,0 +1,56 @@
+// ─── Reset ───────────────────────────────────────────────────────
+// vendors/ is for third-party CSS (normalize.css, a date-picker theme…).
+// You don't edit those files; you override them later in base/.
+// This small reset stands in for one.
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body,
+h1,
+h2,
+h3,
+p,
+figure {
+  margin: 0;
+}
+
+html {
+  text-size-adjust: none;
+}
+
+body {
+  min-height: 100dvh;
+  line-height: 1.5;
+}
+
+img,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+input,
+button,
+textarea,
+select {
+  font: inherit;
+}
+
+// `display: grid` on a component would beat the browser's own
+// [hidden] rule. This keeps the hidden attribute working everywhere.
+[hidden] {
+  display: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -1,0 +1,66 @@
+// ─── Field + input ───────────────────────────────────────────────
+// Two blocks: .field is the wrapper (label, hint, error), .input the
+// control. Rust: src/components/text_field.rs.
+@use '../abstracts' as *;
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: space(1);
+
+  &__label {
+    font-size: text-size('sm');
+    font-weight: 600;
+  }
+
+  &__hint,
+  &__error {
+    font-size: text-size('sm');
+  }
+
+  &__hint {
+    color: clr('text-muted');
+  }
+
+  &__error {
+    color: clr('danger');
+
+    &:empty {
+      display: none;
+    }
+  }
+}
+
+.input {
+  padding: space(2) space(3);
+  border: 1px solid clr('border');
+  border-radius: radius('md');
+  background: clr('surface');
+  color: clr('text');
+  @include transition(border-color, box-shadow);
+
+  &::placeholder {
+    color: clr('text-muted');
+  }
+
+  &:focus-visible {
+    outline: none;
+    border-color: clr('brand');
+    box-shadow: 0 0 0 3px clr('brand-soft');
+  }
+
+  &--invalid {
+    border-color: clr('danger');
+
+    &:focus-visible {
+      border-color: clr('danger');
+      box-shadow: 0 0 0 3px clr('danger-soft');
+    }
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    background: clr('surface-raised');
+  }
+}

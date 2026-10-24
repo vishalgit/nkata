@@ -1,0 +1,10 @@
+// ─── App shell ───────────────────────────────────────────────────
+// data-theme sits on .app, not on <html>, so .app paints its own
+// background and text color from the (possibly overridden) tokens.
+@use '../abstracts' as *;
+
+.app {
+  min-height: 100dvh;
+  background: clr('surface');
+  color: clr('text');
+}

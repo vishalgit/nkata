@@ -1,0 +1,25 @@
+// ─── Sass maps → CSS custom properties ───────────────────────────
+// Maps vanish after compiling. Custom properties live in the browser,
+// so a theme (or devtools) can change them without a rebuild.
+@use '../abstracts' as *;
+
+:root {
+  @each $name, $value in $colors {
+    --color-#{$name}: #{$value};
+  }
+  @each $step, $value in $space {
+    --space-#{$step}: #{$value};
+  }
+  @each $name, $value in $radius {
+    --radius-#{$name}: #{$value};
+  }
+  @each $name, $value in $text-sizes {
+    --text-#{$name}: #{$value};
+  }
+  @each $name, $value in $shadows {
+    --shadow-#{$name}: #{$value};
+  }
+  --font-sans: #{$font-sans};
+  --font-mono: #{$font-mono};
+  color-scheme: light;
+}

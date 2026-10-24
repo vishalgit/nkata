@@ -1,0 +1,26 @@
+// ─── Layout primitives ───────────────────────────────────────────
+// .stack: vertical rhythm.  .cluster: a wrapping row.
+// Gap modifiers come from the space scale, so .stack--3 exists
+// exactly because space step 3 exists.
+@use 'sass:map';
+@use '../abstracts' as *;
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: space(4);
+}
+
+.cluster {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: space(2);
+}
+
+@each $step in map.keys($space) {
+  .stack--#{$step},
+  .cluster--#{$step} {
+    gap: space($step);
+  }
+}

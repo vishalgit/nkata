@@ -1,0 +1,75 @@
+// ─── Button ──────────────────────────────────────────────────────
+// Rust: src/components/button.rs. Every key in $variants and $sizes
+// must match an `as_str()` in the Rust enums (a test checks it).
+@use 'sass:map';
+@use '../abstracts' as *;
+
+$variants: (
+  'primary':   (bg: clr('brand'),   fg: clr('on-brand'), border: clr('brand'),  hover: clr('brand-strong')),
+  'secondary': (bg: clr('surface'), fg: clr('text'),     border: clr('border'), hover: clr('surface-raised')),
+  'ghost':     (bg: transparent,    fg: clr('brand'),    border: transparent,   hover: clr('brand-soft')),
+  'danger':    (bg: clr('danger'),  fg: clr('on-brand'), border: clr('danger'), hover: clr('danger-strong')),
+);
+
+$sizes: (
+  'sm': (pad-y: space(1), pad-x: space(3), text: text-size('sm')),
+  'md': (pad-y: space(2), pad-x: space(4), text: text-size('md')),
+  'lg': (pad-y: space(3), pad-x: space(6), text: text-size('lg')),
+);
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: space(2);
+  border: 1px solid transparent;
+  border-radius: radius('md');
+  font-weight: 600;
+  line-height: 1.2;
+  cursor: pointer;
+  @include transition(background-color, border-color, color);
+  @include focus-ring;
+
+  @each $name, $v in $variants {
+    &--#{$name} {
+      background: map.get($v, bg);
+      color: map.get($v, fg);
+      border-color: map.get($v, border);
+
+      &:hover:not(:disabled) {
+        background: map.get($v, hover);
+      }
+    }
+  }
+
+  @each $name, $s in $sizes {
+    &--#{$name} {
+      padding: map.get($s, pad-y) map.get($s, pad-x);
+      font-size: map.get($s, text);
+    }
+  }
+
+  &--block {
+    width: 100%;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  &__spinner {
+    width: 1em;
+    height: 1em;
+    border: 2px solid currentColor;
+    border-right-color: transparent;
+    border-radius: radius('full');
+    animation: btn-spin 0.7s linear infinite;
+  }
+}
+
+@keyframes btn-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

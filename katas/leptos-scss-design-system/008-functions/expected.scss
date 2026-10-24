@@ -1,0 +1,33 @@
+// ─── Token accessors ─────────────────────────────────────────────
+// Components call these instead of writing var(--…) by hand.
+// A typo becomes a compile error instead of a silently broken style.
+@use 'sass:map';
+@use 'tokens';
+
+// The leading `-` makes this function private to this module.
+@function -lookup($map, $key, $kind) {
+  @if not map.has-key($map, $key) {
+    @error 'Unknown #{$kind} token `#{$key}`. Known: #{map.keys($map)}';
+  }
+  @return $key;
+}
+
+@function clr($name) {
+  @return var(--color-#{-lookup(tokens.$colors, $name, 'color')});
+}
+
+@function space($step) {
+  @return var(--space-#{-lookup(tokens.$space, $step, 'space')});
+}
+
+@function radius($name) {
+  @return var(--radius-#{-lookup(tokens.$radius, $name, 'radius')});
+}
+
+@function text-size($name) {
+  @return var(--text-#{-lookup(tokens.$text-sizes, $name, 'text size')});
+}
+
+@function shadow($name) {
+  @return var(--shadow-#{-lookup(tokens.$shadows, $name, 'shadow')});
+}

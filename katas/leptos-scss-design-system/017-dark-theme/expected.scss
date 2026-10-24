@@ -1,0 +1,19 @@
+// ─── Dark theme ──────────────────────────────────────────────────
+// A theme is new values for the same custom property names.
+// Components never change; only the variables under them do.
+@use 'sass:map';
+@use '../abstracts' as *;
+
+// Fail the build if a dark key has no light twin (a typo, usually).
+@each $name, $_ in $dark-colors {
+  @if not map.has-key($colors, $name) {
+    @error 'Dark color `#{$name}` is not in $colors.';
+  }
+}
+
+[data-theme='dark'] {
+  @each $name, $value in $dark-colors {
+    --color-#{$name}: #{$value};
+  }
+  color-scheme: dark;
+}

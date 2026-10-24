@@ -1,0 +1,53 @@
+// ─── Alert ───────────────────────────────────────────────────────
+// A tone names a color family; '-soft' is built with interpolation.
+@use '../abstracts' as *;
+
+$tones: (
+  'info':    'brand',
+  'success': 'success',
+  'warning': 'warning',
+  'danger':  'danger',
+);
+
+.alert {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: space(1) space(3);
+  padding: space(3) space(4);
+  border: 1px solid clr('border');
+  border-inline-start-width: 4px;
+  border-radius: radius('md');
+
+  @each $tone, $family in $tones {
+    &--#{$tone} {
+      border-inline-start-color: clr($family);
+      background: clr('#{$family}-soft');
+    }
+  }
+
+  &__title {
+    font-weight: 700;
+  }
+
+  &__body {
+    grid-column: 1;
+  }
+
+  &__close {
+    grid-column: 2;
+    grid-row: 1;
+    padding: 0 space(2);
+    border: 0;
+    border-radius: radius('sm');
+    background: transparent;
+    color: clr('text-muted');
+    font-size: text-size('lg');
+    line-height: 1;
+    cursor: pointer;
+    @include focus-ring;
+
+    &:hover {
+      color: clr('text');
+    }
+  }
+}

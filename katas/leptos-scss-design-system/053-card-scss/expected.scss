@@ -1,0 +1,48 @@
+// ─── Card ────────────────────────────────────────────────────────
+@use '../abstracts' as *;
+
+.card {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: radius('lg');
+  background: clr('surface');
+
+  &--outlined {
+    border: 1px solid clr('border');
+  }
+
+  &--elevated {
+    box-shadow: shadow('sm');
+  }
+
+  &--interactive {
+    cursor: pointer;
+    @include transition(box-shadow, transform);
+    @include focus-ring;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: shadow('md');
+    }
+  }
+
+  &__header {
+    padding: space(4) space(4) 0;
+  }
+
+  &__title {
+    font-size: text-size('lg');
+  }
+
+  &__body {
+    flex: 1;
+    padding: space(4);
+  }
+
+  &__footer {
+    padding: space(3) space(4);
+    border-top: 1px solid clr('border');
+    background: clr('surface-raised');
+  }
+}
