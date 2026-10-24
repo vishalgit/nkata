@@ -21,7 +21,9 @@ for set in "$here"/katas/*/; do
   fi
 done
 
-echo "Installed. Try:  nkata ~/katas/org-basics"
+echo "Installed. Try:"
+echo "  nkata ~/katas/org-basics"
+echo "  nkata ~/katas/leptos-scss-design-system"
 case ":$PATH:" in
   *":$HOME/.local/bin:"*) ;;
   *) echo "Note: ~/.local/bin is not on your PATH" ;;

@@ -41,6 +41,7 @@ This installs:
 | `~/.local/bin/nkata` | Launcher |
 | `~/.config/nkata/kata.lua` | Runner |
 | `~/katas/org-basics/` | Sample org.nvim kata set |
+| `~/katas/leptos-scss-design-system/` | Leptos + SCSS design system kata set |
 
 Each kata set is copied only if `~/katas` doesn't already have one with that
 name, so running `install.sh` again updates the launcher and runner but never
