@@ -1,5 +1,0 @@
-* Groceries
-** Fruit
-** Vegetables
-* Errands
-** Post office

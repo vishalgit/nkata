@@ -1,4 +1,0 @@
-* Packing list [1/3]
-- [X] Charger
-- [ ] Passport
-- [ ] Toothbrush

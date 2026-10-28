@@ -1,0 +1,12 @@
+#+TITLE: My GTD
+#+STARTUP: showall nologdone
+#+TODO: TODO(t) NEXT(n) WAITING(w) SOMEDAY(s) | DONE(d) CANCELLED(c)
+#+TAGS: @home(h) @office(o) @phone(p) @computer(c) @errands(e) project(j)
+
+* Next Actions
+** NEXT Start the report
+SCHEDULED: <2026-11-02 Mon>
+** NEXT Submit the tax return
+DEADLINE: <2026-11-30 Mon -7d>
+** NEXT Renew the passport
+DEADLINE: <2026-12-15 Tue -14d>

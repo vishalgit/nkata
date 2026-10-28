@@ -1,0 +1,3 @@
+#+TITLE: My GTD
+#+STARTUP: showall nologdone
+#+TODO: TODO(t) NEXT(n) WAITING(w) SOMEDAY(s) | DONE(d) CANCELLED(c)

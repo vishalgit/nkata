@@ -1,0 +1,15 @@
+#+TITLE: My GTD
+#+STARTUP: showall nologdone
+#+TODO: TODO(t) NEXT(n) WAITING(w) SOMEDAY(s) | DONE(d) CANCELLED(c)
+#+TAGS: @home(h) @office(o) @phone(p) @computer(c) @errands(e) project(j)
+
+* Inbox
+* Next Actions
+** NEXT Pay the electricity bill
+** NEXT Call the dentist
+* Waiting For
+** WAITING Quote from the plumber
+** WAITING Reply from the landlord about the heating
+* Someday/Maybe
+** SOMEDAY Learn the piano
+** SOMEDAY Write a blog post about org mode

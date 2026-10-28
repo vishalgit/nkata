@@ -1,0 +1,2 @@
+#+TITLE: My GTD
+#+STARTUP: showall nologdone

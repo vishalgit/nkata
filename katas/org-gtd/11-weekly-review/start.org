@@ -1,0 +1,12 @@
+#+TITLE: My GTD
+#+STARTUP: showall nologdone
+#+TODO: TODO(t) NEXT(n) WAITING(w) SOMEDAY(s) | DONE(d) CANCELLED(c)
+#+TAGS: @home(h) @office(o) @phone(p) @computer(c) @errands(e) project(j)
+
+* TODO Weekly review [0/5]
+SCHEDULED: <2026-11-06 Fri>
+- [ ] Empty the inbox
+- [ ] Review next actions
+- [ ] Review waiting for
+- [ ] Review projects
+- [ ] Review someday/maybe

@@ -1,0 +1,10 @@
+#+TITLE: My GTD
+#+STARTUP: showall nologdone
+#+TODO: TODO(t) NEXT(n) WAITING(w) SOMEDAY(s) | DONE(d) CANCELLED(c)
+#+TAGS: @home(h) @office(o) @phone(p) @computer(c) @errands(e) project(j)
+
+* Inbox
+** NEXT Call the dentist
+** WAITING Reply from the landlord about the heating
+** SOMEDAY Write a blog post about org mode
+** CANCELLED Fix the typo in an old note
