@@ -35,7 +35,8 @@ local config = {
   to_solution_key = "<M-s>", -- any pane → solution (final result) pane
   tmp_root = "/tmp/nkata",
   claude_cmd = "claude", -- override with the NKATA_CLAUDE_CMD env var
-  notify_claude_on_switch = true, -- tell Claude when you move to another kata
+  notify_claude_on_switch = false, -- tell Claude when you move to another kata (costs a model turn)
+  clear_claude_on_switch = true, -- send /clear to Claude when you move to another kata (no model call)
   pass_color = "#a6e3a1",
   fail_color = "#f38ba8",
 }
@@ -81,6 +82,12 @@ about "this kata", read {{CURRENT}} — it names the kata and gives the paths
 of its files. When a message starts with "[nkata]", the user has moved to
 another kata: re-read that file and reply with one short line naming the
 new kata. Nothing more.
+
+Moving between katas does not message you; the pane is cleared instead. Do
+nothing until the user asks. When a message is just "kata?" (optionally
+followed by a question), read {{CURRENT}}, then read the kata's final result
+and the user's live attempt, and give a short hint on what differs. Without
+a question after "kata?", reply with the kata's name and one hint.
 
 ## Hints, not answers
 You may read the final result file to compare it with the user's live
@@ -446,6 +453,22 @@ local function notify_claude(k)
   end, 200)
 end
 
+-- Wipe Claude's conversation so old katas aren't re-sent with every turn.
+-- /clear is handled locally by Claude Code, so it costs no tokens. Ctrl-U
+-- first drops anything half-typed in the prompt.
+local function clear_claude()
+  if not (config.clear_claude_on_switch and claude_alive()) then
+    return
+  end
+  local job = S.claude_job
+  vim.fn.chansend(job, "\21/clear")
+  vim.defer_fn(function()
+    if S.claude_job == job and claude_alive() then
+      vim.fn.chansend(job, "\r")
+    end
+  end, 200)
+end
+
 -- ── Instruction pane ────────────────────────────────────────────────────
 local function render()
   local b = S.buf.instr
@@ -658,6 +681,7 @@ local function load_kata(idx, tell_claude)
   write_current(k)
   ensure_claude()
   if tell_claude then
+    clear_claude()
     notify_claude(k)
   end
 

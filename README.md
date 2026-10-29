@@ -143,9 +143,12 @@ working directory, and keeps the same conversation as you move between katas.
   on disk; a new starter applies on the next `<leader>kr`. Claude is told not
   to touch other katas, `.progress.json` or your attempt unless you ask.
 
-Each kata-switch notice is a short message to Claude, so it uses a little of
-your usage. Turn it off with `notify_claude_on_switch = false` in `kata.lua`;
-Claude still re-reads the current kata whenever you ask it something.
+Moving to another kata sends nothing to Claude except `/clear`, which Claude
+Code handles locally, so navigation costs no tokens and old katas drop out of
+the context. Type `kata?` (optionally followed by a question) in pane 4 when you
+want Claude to read the current kata and give a hint. To make Claude announce
+each switch instead, set `notify_claude_on_switch = true` (this costs a model
+turn per switch); `clear_claude_on_switch = false` stops the clearing.
 
 ### How a kata passes
 
@@ -177,7 +180,8 @@ A kata set is any folder of kata folders. They run in folder-name order.
 | Neovim profile | `NKATA_NVIM_APPNAME` env var | `kickstart` |
 | Runner location | `NKATA_HOME` env var | `~/.config/nkata` |
 | Claude command | `NKATA_CLAUDE_CMD` env var, or `claude_cmd` in `kata.lua` | `claude` |
-| Kata-switch notices to Claude | `notify_claude_on_switch` in `kata.lua` | on |
+| Kata-switch notices to Claude | `notify_claude_on_switch` in `kata.lua` | off |
+| Clear Claude on kata switch | `clear_claude_on_switch` in `kata.lua` | on |
 | Keymap prefix | `prefix` at the top of `kata.lua` | `<leader>k` |
 | Pane-hop keys | `to_claude_key` / `to_editor_key` / `to_instr_key` / `to_solution_key` in `kata.lua` | `<M-c>` / `<M-e>` / `<M-i>` / `<M-s>` |
 | Scratch file folder | `tmp_root` at the top of `kata.lua` | `/tmp/nkata` |
