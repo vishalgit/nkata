@@ -1,0 +1,18 @@
+@use '../abstracts' as *;
+
+.todo-item {
+  display: flex;
+  align-items: center;
+  gap: space(3);
+  padding: space(3) space(4);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: $radius-md;
+
+  &__title { flex: 1; }
+
+  &--completed &__title {
+    text-decoration: line-through;
+    color: var(--color-muted);
+  }
+}

@@ -1,0 +1,21 @@
+@use '../abstracts' as *;
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  gap: space(2);
+  padding: space(2) space(4);
+  border: 1px solid transparent;
+  border-radius: $radius-sm;
+  font-weight: 600;
+  cursor: pointer;
+  background: none;
+  color: inherit;
+
+  &:focus-visible { @include focus-ring; }
+
+  &--primary { background: var(--color-primary); color: var(--color-primary-text); }
+  &--ghost { border-color: var(--color-border); }
+  &--danger { color: var(--color-danger); }
+  &--small { padding: space(1) space(2); font-size: 0.875rem; }
+}

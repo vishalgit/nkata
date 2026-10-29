@@ -1,0 +1,7 @@
+[jobs.http]
+command = ["cargo", "test", "-p", "server", "--color", "always"]
+need_stdout = true
+env = { CARGO_TARGET_DIR = "target/bacon" }
+
+[keybindings]
+h = "job:http"

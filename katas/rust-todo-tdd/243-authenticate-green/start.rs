@@ -1,0 +1,28 @@
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use uuid::Uuid;
+
+    fn stored() -> StoredCredentials {
+        StoredCredentials {
+            user_id: UserId::from_uuid(Uuid::from_u128(7)),
+            role: Role::Admin,
+            password_hash: PasswordHash::new("hash-of-right".into()),
+        }
+    }
+    fn verify(candidate: &str, hash: &PasswordHash) -> bool {
+        hash.as_str() == format!("hash-of-{candidate}")
+    }
+
+    #[test]
+    fn the_right_password_yields_the_actor_with_its_role() {
+        let actor = authenticate(Some(stored()), "right", verify).unwrap();
+        assert_eq!(
+            actor,
+            Actor {
+                id: stored().user_id,
+                role: Role::Admin
+            }
+        );
+    }
+}

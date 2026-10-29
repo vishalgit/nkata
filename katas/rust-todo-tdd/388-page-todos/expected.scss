@@ -1,0 +1,6 @@
+@use '../abstracts' as *;
+
+.todo-board {
+  display: grid;
+  gap: space(2);
+}

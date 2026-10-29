@@ -1,0 +1,15 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: todo
+  namespace: todo
+spec:
+  namespaceSelector:
+    any: true            # scrape todo, todo-dev, todo-test and todo-prod
+  selector:
+    matchLabels:
+      app: todo-metrics
+  endpoints:
+    - port: metrics
+      path: /metrics
+      interval: 15s

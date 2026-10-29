@@ -1,0 +1,16 @@
+@use '../abstracts' as *;
+
+.filter-bar {
+  display: flex;
+  gap: space(1);
+  margin-bottom: space(2);
+
+  &__link {
+    padding: space(1) space(3);
+    border-radius: $radius-sm;
+    text-decoration: none;
+    color: var(--color-muted);
+
+    &--active { background: var(--color-surface); color: var(--color-text); font-weight: 600; }
+  }
+}

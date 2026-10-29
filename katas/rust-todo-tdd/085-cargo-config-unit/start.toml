@@ -1,0 +1,3 @@
+[alias]
+t-http = "test -p server"
+lint   = "clippy -p server --all-targets -- -D warnings"

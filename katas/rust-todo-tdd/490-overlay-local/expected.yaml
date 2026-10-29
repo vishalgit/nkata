@@ -1,0 +1,5 @@
+# The Chapter 2 playground and CI's throwaway cluster. Plaintext, local-only password.
+namespace: todo
+resources:
+  - ../../base
+  - secret.yaml

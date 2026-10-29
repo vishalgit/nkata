@@ -1,0 +1,61 @@
+name: todo
+
+services:
+  db:
+    image: postgres:latest
+    user: "1000:1000"
+    environment:
+      POSTGRES_USER: todo
+      POSTGRES_PASSWORD: todo
+      POSTGRES_DB: todo_dev
+    volumes:
+      - ./.pgdata:/var/lib/postgresql
+    ports:
+      - "127.0.0.1:5432:5432"     # for Neovim (vim-dadbod) and rust-analyzer on the host
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U todo -d todo_dev"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+  dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    user: "1000:1000"
+    command: sleep infinity
+    working_dir: /workspace
+    environment:
+      DATABASE_URL: postgres://todo:todo@db:5432/todo_dev
+      RUST_LOG: info,sqlx=warn
+      RUST_BACKTRACE: "1"
+    volumes:
+      - .:/workspace
+      - cargo-registry:/usr/local/cargo/registry
+      - cargo-git:/usr/local/cargo/git
+      - dev-cache:/home/vishal/.cache
+    ports:
+      - "3000:3000"   # the app
+      - "3001:3001"   # cargo-leptos live reload
+    depends_on:
+      db:
+        condition: service_healthy
+
+  e2e:
+    image: mcr.microsoft.com/playwright:v${PLAYWRIGHT_VERSION}-noble
+    profiles: ["e2e"]
+    user: "1000:1000"
+    working_dir: /e2e
+    ipc: host
+    environment:
+      BASE_URL: ${E2E_BASE_URL:-http://dev:3000}
+      HOME: /tmp
+    volumes:
+      - ./end2end:/e2e
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+volumes:
+  cargo-registry:
+  cargo-git:
+  dev-cache:

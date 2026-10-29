@@ -1,0 +1,47 @@
+# https://editorconfig.org
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 4
+
+# Rust and Cargo: matches rustfmt's defaults (4 spaces, 100 columns)
+[*.{rs,toml}]
+indent_size = 4
+max_line_length = 100
+
+[*.sql]
+indent_size = 4
+
+[{Dockerfile,Dockerfile.*}]
+indent_size = 4
+
+# Web, config and test code: 2 spaces
+[*.{scss,css,html,ts,js,json,yml,yaml}]
+indent_size = 2
+
+# Shell scripts and the extension-less ones in bin/
+[{*.sh,bin/*}]
+indent_size = 2
+
+# Markdown: two trailing spaces are a line break, and prose is not wrapped
+[*.md]
+trim_trailing_whitespace = false
+max_line_length = off
+
+# Pipe-separated backlog files: keep every byte as written
+[backlog/*.psv]
+trim_trailing_whitespace = false
+
+# Generated, encrypted or binary: leave alone (SOPS writes 4-space YAML)
+[{Cargo.lock,end2end/package-lock.json,.sqlx/**,docs/domain-stories/*.{svg,png},deploy/k8s/overlays/*/secret.enc.yaml}]
+charset = unset
+end_of_line = unset
+insert_final_newline = unset
+trim_trailing_whitespace = unset
+indent_style = unset
+indent_size = unset

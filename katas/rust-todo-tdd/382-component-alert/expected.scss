@@ -1,0 +1,8 @@
+@use '../abstracts' as *;
+
+.alert {
+  padding: space(3) space(4);
+  border-radius: $radius-sm;
+
+  &--error { background: var(--color-danger-bg); color: var(--color-danger); }
+}

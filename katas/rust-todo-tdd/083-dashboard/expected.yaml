@@ -1,0 +1,40 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: todo-dashboard
+  namespace: monitoring
+  labels:
+    grafana_dashboard: "1"
+data:
+  todo.json: |
+    {
+      "title": "Todo app",
+      "uid": "todo-app",
+      "refresh": "30s",
+      "time": { "from": "now-1h", "to": "now" },
+      "panels": [
+        { "type": "stat", "title": "Ready pods", "gridPos": { "x": 0, "y": 0, "w": 6, "h": 4 },
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "targets": [ { "expr": "kube_deployment_status_replicas_available{namespace=\"todo\", deployment=\"todo\"}" } ] },
+        { "type": "stat", "title": "Database", "gridPos": { "x": 6, "y": 0, "w": 6, "h": 4 },
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "targets": [ { "expr": "min(app_database_up{namespace=\"todo\"})" } ],
+          "fieldConfig": { "defaults": { "mappings": [ { "type": "value", "options": {
+            "0": { "text": "DOWN", "color": "red" }, "1": { "text": "UP", "color": "green" } } } ] } } },
+        { "type": "stat", "title": "Restarts (1h)", "gridPos": { "x": 12, "y": 0, "w": 6, "h": 4 },
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "targets": [ { "expr": "sum(increase(kube_pod_container_status_restarts_total{namespace=\"todo\"}[1h]))" } ] },
+        { "type": "stat", "title": "5xx per second", "gridPos": { "x": 18, "y": 0, "w": 6, "h": 4 },
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "targets": [ { "expr": "sum(rate(http_requests_total{namespace=\"todo\", status=~\"5..\"}[5m])) or vector(0)" } ] },
+        { "type": "timeseries", "title": "Requests per second by status", "gridPos": { "x": 0, "y": 4, "w": 12, "h": 8 },
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "targets": [ { "expr": "sum by (status) (rate(http_requests_total{namespace=\"todo\"}[5m]))", "legendFormat": "{{status}}" } ] },
+        { "type": "timeseries", "title": "p95 latency (seconds)", "gridPos": { "x": 12, "y": 4, "w": 12, "h": 8 },
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "targets": [ { "expr": "histogram_quantile(0.95, sum by (le) (rate(http_request_duration_seconds_bucket{namespace=\"todo\"}[5m])))" } ] },
+        { "type": "logs", "title": "Logs (todo namespace)", "gridPos": { "x": 0, "y": 12, "w": 24, "h": 10 },
+          "datasource": { "type": "loki", "uid": "loki" },
+          "targets": [ { "expr": "{namespace=\"todo\"}" } ] }
+      ]
+    }

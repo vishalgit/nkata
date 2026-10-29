@@ -1,0 +1,18 @@
+@use '../abstracts' as *;
+
+.form {
+  display: grid;
+  gap: space(4);
+
+  &__field { display: grid; gap: space(1); }
+  &__label { font-size: 0.875rem; font-weight: 600; }
+  &__input {
+    padding: space(2) space(3);
+    border: 1px solid var(--color-border);
+    border-radius: $radius-sm;
+    background: var(--color-surface);
+    color: var(--color-text);
+
+    &:focus-visible { @include focus-ring; }
+  }
+}

@@ -1,0 +1,80 @@
+name: pipeline
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: EditorConfig
+        run: docker run --rm -v "$PWD:/check" mstruebing/editorconfig-checker
+      - name: Hand the workspace to uid 1000
+        run: mkdir -p .pgdata && sudo chown -R 1000:1000 .
+      - name: Start db and dev containers
+        run: docker compose up -d --build --wait db dev
+      - name: Format
+        run: docker compose exec -T dev cargo fmt --all --check
+      - name: Lint
+        run: docker compose exec -T dev cargo lint
+      - name: Dependencies
+        run: docker compose exec -T dev cargo deny check
+      - name: HTTP tests
+        run: docker compose exec -T dev cargo t-http
+      - name: Start the app for E2E
+        run: |
+          docker compose exec -d dev cargo leptos serve
+          timeout 1200 bash -c 'until curl -fs localhost:3000/healthz; do sleep 5; done'
+      - name: E2E tests
+        run: docker compose --profile e2e run --rm e2e sh -c "npm ci && npx playwright test"
+      - name: Give the workspace back to the runner
+        if: always()
+        run: sudo chown -R "$(id -u):$(id -g)" .
+
+  deliver:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install k3d
+        run: curl -s https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | bash
+      - name: Create a throwaway cluster
+        run: k3d cluster create todo --agents 1 --port "8080:80@loadbalancer" --wait
+      - name: Build, deploy and smoke-test
+        run: bin/deploy "${{ github.sha }}"
+      - name: Publish the image (main only)
+        if: github.ref == 'refs/heads/main'
+        run: |
+          IMAGE="ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/todo"
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+          docker tag "todo:${{ github.sha }}" "$IMAGE:${{ github.sha }}"
+          docker tag "todo:${{ github.sha }}" "$IMAGE:latest"
+          docker push "$IMAGE:${{ github.sha }}"
+          docker push "$IMAGE:latest"
+
+  release:
+    needs: deliver
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    concurrency: release
+    outputs:
+      tag: ${{ steps.rp.outputs.tag_name }}
+    steps:
+      - id: rp
+        uses: googleapis/release-please-action@v4
+        with:
+          token: ${{ secrets.RELEASE_TOKEN }}
+          config-file: .github/release-please-config.json
+          manifest-file: .github/.release-please-manifest.json
+      - name: Give the tested image its version
+        if: steps.rp.outputs.release_created == 'true'
+        run: |
+          IMAGE="ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/todo"
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+          docker buildx imagetools create -t "$IMAGE:${{ steps.rp.outputs.tag_name }}" "$IMAGE:${{ github.sha }}"

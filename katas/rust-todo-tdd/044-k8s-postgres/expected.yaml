@@ -1,0 +1,66 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: postgres
+  namespace: todo
+stringData:
+  POSTGRES_USER: todo
+  POSTGRES_PASSWORD: change-me          # a local cluster only; real environments get SOPS in Chapter 12
+  POSTGRES_DB: todo
+  DATABASE_URL: postgres://todo:change-me@postgres:5432/todo
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres
+  namespace: todo
+spec:
+  selector:
+    app: postgres
+  ports:
+    - port: 5432
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgres
+  namespace: todo
+spec:
+  serviceName: postgres
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+      containers:
+        - name: postgres
+          image: postgres:latest
+          envFrom:
+            - secretRef:
+                name: postgres
+          ports:
+            - containerPort: 5432
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/postgresql
+          readinessProbe:
+            exec:
+              command: ["pg_isready", "-U", "todo", "-d", "todo"]
+            periodSeconds: 5
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 1Gi

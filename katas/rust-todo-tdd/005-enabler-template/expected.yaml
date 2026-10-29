@@ -1,0 +1,33 @@
+name: Enabler
+description: Something the developer or operator gains when it is finished
+title: "TODO-<n> · <short title>"
+labels: ["type:enabler"]
+body:
+  - type: dropdown
+    id: epic
+    attributes:
+      label: Epic
+      options: [E0 Delivery platform, E1 Manage my todos, E2 Find my todos, E3 My account, E4 Privacy and roles, E5 Operate the app, E6 Production readiness]
+    validations: { required: true }
+  - type: textarea
+    id: story
+    attributes:
+      label: Story
+      value: "As the developer … I want … so that …"
+    validations: { required: true }
+  - type: textarea
+    id: criteria
+    attributes:
+      label: Acceptance criteria
+      description: One bullet per behaviour, each naming the test that proves it
+      value: "- [ ] <behaviour> → `<test_name>`"
+    validations: { required: true }
+  - type: textarea
+    id: tasks
+    attributes:
+      label: Tasks
+      description: One line per task, with the chapter and section
+      value: "- [ ] Ch 4 · <task> (4.x)"
+  - type: input
+    id: points
+    attributes: { label: Story points, placeholder: "1, 2, 3, 5, 8, 13" }

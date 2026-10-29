@@ -1,0 +1,9 @@
+namespace: todo-prod
+resources:
+  - ../../base
+patches:
+  - target: { kind: Ingress, name: todo }
+    patch: |-
+      - op: add
+        path: /spec/rules/0/host
+        value: todo.localhost

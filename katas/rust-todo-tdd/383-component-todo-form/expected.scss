@@ -1,0 +1,18 @@
+@use '../abstracts' as *;
+
+.todo-form {
+  display: flex;
+  gap: space(2);
+  margin-bottom: space(4);
+
+  &__input {
+    flex: 1;
+    padding: space(2) space(3);
+    border: 1px solid var(--color-border);
+    border-radius: $radius-sm;
+    background: var(--color-surface);
+    color: var(--color-text);
+
+    &:focus-visible { @include focus-ring; }
+  }
+}

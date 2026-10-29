@@ -1,0 +1,26 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: todo
+  namespace: todo
+spec:
+  groups:
+    - name: todo
+      rules:
+        - alert: TodoNoReadyPods
+          expr: kube_deployment_status_replicas_available{namespace="todo", deployment="todo"} < 1
+          for: 2m
+          labels: { severity: critical }
+          annotations: { summary: "No todo pod is ready" }
+        - alert: TodoDatabaseUnreachable
+          expr: min(app_database_up{namespace="todo"}) == 0
+          for: 2m
+          labels: { severity: critical }
+          annotations: { summary: "The todo app cannot reach Postgres" }
+        - alert: TodoHighErrorRate
+          expr: |
+            sum(rate(http_requests_total{namespace="todo", status=~"5.."}[5m]))
+              / sum(rate(http_requests_total{namespace="todo"}[5m])) > 0.05
+          for: 5m
+          labels: { severity: warning }
+          annotations: { summary: "More than 5% of requests fail" }

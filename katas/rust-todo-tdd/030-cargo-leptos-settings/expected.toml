@@ -1,0 +1,29 @@
+[workspace]
+resolver = "3"
+members = ["crates/*"]
+
+# Release profile for the WASM bundle: small and fast
+[profile.wasm-release]
+inherits = "release"
+opt-level = "z"
+lto = true
+codegen-units = 1
+panic = "abort"
+
+[[workspace.metadata.leptos]]
+name = "todo"                 # -> /pkg/todo.js, /pkg/todo.wasm, /pkg/todo.css
+bin-package = "server"
+lib-package = "frontend"
+site-root = "target/site"
+site-pkg-dir = "pkg"
+style-file = "style/main.scss"
+assets-dir = "public"
+site-addr = "0.0.0.0:3000"    # 0.0.0.0 so Docker can publish the port
+reload-port = 3001
+browserquery = "defaults"
+env = "DEV"
+bin-features = []
+bin-default-features = false
+lib-features = []
+lib-default-features = false
+lib-profile-release = "wasm-release"

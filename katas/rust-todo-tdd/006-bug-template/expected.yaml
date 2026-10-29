@@ -1,0 +1,24 @@
+name: Bug
+description: Behaviour that contradicts an acceptance criterion
+title: "<what is wrong>"
+labels: ["type:bug"]
+body:
+  - type: input
+    id: story
+    attributes: { label: Story it breaks, placeholder: "#11 TODO-11 · Search my todos" }
+    validations: { required: true }
+  - type: textarea
+    id: steps
+    attributes: { label: Steps to reproduce, value: "1. " }
+    validations: { required: true }
+  - type: textarea
+    id: expected
+    attributes: { label: Expected }
+    validations: { required: true }
+  - type: textarea
+    id: actual
+    attributes: { label: Actual }
+    validations: { required: true }
+  - type: input
+    id: test
+    attributes: { label: The failing test that will prove the fix, placeholder: "`wildcards_typed_by_the_user_match_literally`" }

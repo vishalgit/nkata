@@ -1,0 +1,159 @@
+name: pipeline
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Deploy configuration
+        run: bin/check-overlays && bin/check-secrets
+      - name: EditorConfig
+        run: docker run --rm -v "$PWD:/check" mstruebing/editorconfig-checker
+      - name: Hand the workspace to uid 1000
+        run: mkdir -p .pgdata && sudo chown -R 1000:1000 .
+      - name: Start db and dev containers
+        run: docker compose up -d --build --wait db dev
+      - name: Migrate the dev database
+        run: docker compose exec -T dev sqlx migrate run
+      - name: Offline query data is current
+        run: docker compose exec -T dev cargo sqlx prepare --check --workspace -- -p server
+      - name: Format
+        run: docker compose exec -T dev cargo fmt --all --check
+      - name: Lint
+        run: docker compose exec -T dev cargo lint
+      - name: Dependencies
+        run: docker compose exec -T dev cargo deny check
+      - name: Unit tests
+        run: docker compose exec -T dev cargo t-unit
+      - name: Integration tests
+        run: docker compose exec -T dev cargo t-int
+      - name: HTTP tests
+        run: docker compose exec -T dev cargo t-http
+      - name: Start the app for E2E
+        run: |
+          docker compose exec -d dev cargo leptos serve
+          timeout 1200 bash -c 'until curl -fs localhost:3000/healthz; do sleep 5; done'
+      - name: E2E tests
+        run: docker compose --profile e2e run --rm e2e sh -c "npm ci && npx playwright test"
+      - name: Give the workspace back to the runner
+        if: always()
+        run: sudo chown -R "$(id -u):$(id -g)" .
+
+  deliver:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install k3d
+        run: curl -s https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | bash
+      - name: Create a throwaway cluster
+        run: k3d cluster create todo --agents 1 --port "8080:80@loadbalancer" --wait
+      - name: Build, deploy and smoke-test
+        run: bin/deploy "${{ github.sha }}"
+      - name: Publish the image (main only)
+        if: github.ref == 'refs/heads/main'
+        run: |
+          IMAGE="ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/todo"
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+          docker tag "todo:${{ github.sha }}" "$IMAGE:${{ github.sha }}"
+          docker tag "todo:${{ github.sha }}" "$IMAGE:latest"
+          docker push "$IMAGE:${{ github.sha }}"
+          docker push "$IMAGE:latest"
+
+  release:
+    needs: deliver
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    concurrency: release
+    outputs:
+      tag: ${{ steps.rp.outputs.tag_name }}
+    steps:
+      - id: rp
+        uses: googleapis/release-please-action@v4
+        with:
+          token: ${{ secrets.RELEASE_TOKEN }}
+          config-file: .github/release-please-config.json
+          manifest-file: .github/.release-please-manifest.json
+      - name: Give the tested image its version
+        if: steps.rp.outputs.release_created == 'true'
+        run: |
+          IMAGE="ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/todo"
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+          docker buildx imagetools create -t "$IMAGE:${{ steps.rp.outputs.tag_name }}" "$IMAGE:${{ github.sha }}"
+
+  deploy-dev:
+    needs: deliver
+    if: github.ref == 'refs/heads/main'
+    runs-on: [self-hosted, linux, home]
+    concurrency: deploy-dev
+    environment:
+      name: dev
+      url: http://dev.todo.localhost:8080
+    steps:
+      - uses: actions/checkout@v4
+      - name: Log in to GHCR
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+      - name: Promote to dev
+        run: bin/promote dev "${{ github.sha }}"
+
+  deploy-test:
+    needs: deploy-dev
+    runs-on: [self-hosted, linux, home]
+    concurrency: deploy-test
+    environment:
+      name: test
+      url: http://test.todo.localhost:8080
+    steps:
+      - uses: actions/checkout@v4
+      - name: Log in to GHCR
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+      - name: Promote to test
+        run: bin/promote test "${{ github.sha }}"
+      - name: E2E against test
+        env:
+          E2E_TARGET: k3d
+          E2E_BASE_URL: http://test.todo.localhost:8080
+        run: |
+          bin/e2e npm ci
+          bin/e2e
+
+  approve-prod:
+    needs: [deploy-test, release]
+    # a failed release job (an expired RELEASE_TOKEN, say) never blocks a deploy
+    if: ${{ !cancelled() && needs.deploy-test.result == 'success' }}
+    runs-on: [self-hosted, linux, gate]
+    timeout-minutes: 720          # unanswered for 12 hours: the run fails; re-run the job to ask again
+    concurrency: approve-prod
+    permissions:
+      issues: write
+    steps:
+      - uses: trstringer/manual-approval@v1
+        with:
+          secret: ${{ github.token }}
+          approvers: ${{ github.repository_owner }}
+          minimum-approvals: 1
+          issue-title: "Promote ${{ needs.release.outputs.tag || github.sha }} to prod"
+          issue-body: "Dev and test run this commit, and E2E passed on http://test.todo.localhost:8080. Comment approve to promote it, or deny to stop."
+
+  deploy-prod:
+    needs: approve-prod
+    if: ${{ !cancelled() && needs.approve-prod.result == 'success' }}
+    runs-on: [self-hosted, linux, home]
+    concurrency: deploy-prod
+    environment:
+      name: prod
+      url: http://todo.localhost:8080
+    steps:
+      - uses: actions/checkout@v4
+      - name: Log in to GHCR
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+      - name: Promote to prod
+        run: bin/promote prod "${{ github.sha }}"

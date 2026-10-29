@@ -1,0 +1,2 @@
+[alias]
+t-http = "test -p server"

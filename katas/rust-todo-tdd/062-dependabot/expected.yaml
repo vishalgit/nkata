@@ -1,0 +1,21 @@
+version: 2
+updates:
+  - package-ecosystem: cargo
+    directory: /
+    schedule: { interval: weekly }
+    commit-message: { prefix: deps }     # PR title "deps: bump …": a patch release
+    groups:
+      leptos: { patterns: ["leptos*", "server_fn*"] }
+      minor-and-patch: { update-types: [minor, patch] }
+  - package-ecosystem: npm
+    directory: /end2end
+    schedule: { interval: weekly }
+    commit-message: { prefix: deps }
+  - package-ecosystem: docker
+    directory: /
+    schedule: { interval: monthly }
+    commit-message: { prefix: deps }
+  - package-ecosystem: github-actions
+    directory: /
+    schedule: { interval: monthly }
+    commit-message: { prefix: ci }       # pipeline only: no release on its own

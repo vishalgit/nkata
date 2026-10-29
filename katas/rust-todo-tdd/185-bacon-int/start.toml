@@ -1,0 +1,19 @@
+[jobs.http]
+command = ["cargo", "test", "-p", "server", "--color", "always"]
+need_stdout = true
+env = { CARGO_TARGET_DIR = "target/bacon" }
+
+[jobs.unit]
+command = ["cargo", "test", "-p", "domain", "--color", "always"]
+need_stdout = true
+env = { CARGO_TARGET_DIR = "target/bacon" }
+
+[jobs.lint]
+command = ["cargo", "clippy", "-p", "domain", "-p", "server", "--all-targets", "--color", "always", "--", "-D", "warnings"]
+need_stdout = false
+env = { CARGO_TARGET_DIR = "target/bacon" }
+
+[keybindings]
+h = "job:http"
+u = "job:unit"
+l = "job:lint"

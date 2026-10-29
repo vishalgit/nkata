@@ -1,0 +1,13 @@
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-bg: oklch(18% 0.01 250);
+    --color-surface: oklch(23% 0.015 250);
+    --color-text: oklch(92% 0.01 250);
+    --color-muted: oklch(70% 0.02 250);
+    --color-border: oklch(32% 0.02 250);
+    --color-primary: oklch(68% 0.16 260);
+    --color-primary-text: oklch(15% 0.02 260);
+    --color-danger: oklch(70% 0.17 25);
+    --color-danger-bg: oklch(28% 0.06 25);
+  }
+}

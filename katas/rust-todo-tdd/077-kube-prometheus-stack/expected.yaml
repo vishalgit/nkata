@@ -1,0 +1,30 @@
+alertmanager:
+  enabled: false            # alerts stay visible in Grafana; add notifications later
+
+# k3s runs these inside one process; scraping them separately only produces errors
+kubeEtcd: { enabled: false }
+kubeScheduler: { enabled: false }
+kubeControllerManager: { enabled: false }
+kubeProxy: { enabled: false }
+
+prometheus:
+  prometheusSpec:
+    retention: 3d
+    # pick up ServiceMonitors and rules from every namespace, not just this release
+    serviceMonitorSelectorNilUsesHelmValues: false
+    podMonitorSelectorNilUsesHelmValues: false
+    ruleSelectorNilUsesHelmValues: false
+    resources:
+      requests: { memory: 256Mi }
+
+grafana:
+  adminPassword: admin      # local cluster only
+  sidecar:
+    dashboards:
+      enabled: true         # loads ConfigMaps labelled grafana_dashboard="1"
+  additionalDataSources:
+    - name: Loki
+      uid: loki
+      type: loki
+      access: proxy
+      url: http://loki.monitoring.svc:3100

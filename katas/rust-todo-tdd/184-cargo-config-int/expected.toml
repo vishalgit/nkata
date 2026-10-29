@@ -1,0 +1,5 @@
+[alias]
+t-http = "test -p server"
+t-unit = "test -p domain"
+t-int  = "test -p app --features ssr"
+lint   = "clippy -p domain -p server --all-targets -- -D warnings"

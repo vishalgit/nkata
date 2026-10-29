@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: postgres
+  namespace: todo
+stringData:
+  POSTGRES_USER: todo
+  POSTGRES_PASSWORD: change-me          # a local cluster only; real environments get SOPS in Chapter 12
+  POSTGRES_DB: todo
+  DATABASE_URL: postgres://todo:change-me@postgres:5432/todo

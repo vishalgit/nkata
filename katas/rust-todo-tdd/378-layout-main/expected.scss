@@ -1,0 +1,9 @@
+@use '../abstracts' as *;
+
+.l-main {
+  max-width: $content-width;
+  margin-inline: auto;
+  padding: space(8) space(4);
+
+  @include from(md) { padding-block: space(12); }
+}
