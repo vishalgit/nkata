@@ -78,6 +78,8 @@ nkata --help
 | `<leader>kq` | Save progress and quit |
 | `<M-c>` | From the editor (normal or insert mode): into Claude, ready to type |
 | `<M-e>` | From inside Claude (terminal mode): straight back to the editor |
+| `<M-i>` | From any pane: jump to the instruction pane |
+| `<M-s>` | From any pane: jump to the solution (final result) pane |
 
 The same actions exist as commands: `:KataNext`, `:KataPrev`, `:KataGoto [n]`,
 `:KataReset`, `:KataCopy [path]`, `:KataRun [cmd]`, `:KataClaude`, `:KataEditor`,
@@ -118,7 +120,7 @@ the kata. `:KataCopy ~/notes/headings.org` does the same without the prompt.
 
 The `<leader>k…` keymaps are normal-mode only. Inside the Claude pane you're in
 terminal mode, where `<leader>` is typed into Claude, so use `<M-e>` to get
-back. Change the two Alt keys with `to_claude_key` / `to_editor_key` at the top
+back. Change the Alt keys with `to_claude_key` / `to_editor_key` / `to_instr_key` / `to_solution_key` at the top
 of `kata.lua`; avoid keys Claude Code uses itself, such as `Esc`, `Ctrl-c`,
 `Ctrl-d` and `Ctrl-r`.
 
@@ -177,7 +179,7 @@ A kata set is any folder of kata folders. They run in folder-name order.
 | Claude command | `NKATA_CLAUDE_CMD` env var, or `claude_cmd` in `kata.lua` | `claude` |
 | Kata-switch notices to Claude | `notify_claude_on_switch` in `kata.lua` | on |
 | Keymap prefix | `prefix` at the top of `kata.lua` | `<leader>k` |
-| Pane-hop keys | `to_claude_key` / `to_editor_key` in `kata.lua` | `<M-c>` / `<M-e>` |
+| Pane-hop keys | `to_claude_key` / `to_editor_key` / `to_instr_key` / `to_solution_key` in `kata.lua` | `<M-c>` / `<M-e>` / `<M-i>` / `<M-s>` |
 | Scratch file folder | `tmp_root` at the top of `kata.lua` | `/tmp/nkata` |
 | Pass/fail colours | `pass_color` / `fail_color` in `kata.lua` | green / red |
 

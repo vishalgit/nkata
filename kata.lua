@@ -31,6 +31,8 @@ local config = {
   prefix = "<leader>k", -- next = n, prev = p, goto = g, reset = r, copy = w, run = x, claude = c, editor = e, quit = q
   to_claude_key = "<M-c>", -- editor (normal/insert) → Claude pane in insert mode
   to_editor_key = "<M-e>", -- Claude pane (terminal mode) → back to the editor
+  to_instr_key = "<M-i>", -- any pane → instruction pane
+  to_solution_key = "<M-s>", -- any pane → solution (final result) pane
   tmp_root = "/tmp/nkata",
   claude_cmd = "claude", -- override with the NKATA_CLAUDE_CMD env var
   notify_claude_on_switch = true, -- tell Claude when you move to another kata
@@ -757,6 +759,22 @@ function M.editor()
   end
 end
 
+-- Focus the instruction pane.
+function M.instruction()
+  ensure_layout()
+  if win_ok(S.win.instr) then
+    api.nvim_set_current_win(S.win.instr)
+  end
+end
+
+-- Focus the solution (final result) pane.
+function M.solution()
+  ensure_layout()
+  if win_ok(S.win.result) then
+    api.nvim_set_current_win(S.win.result)
+  end
+end
+
 -- Write a copy of the editor pane's current text to a path you type in.
 -- Copies what's in the buffer right now (saved or not); the kata itself is
 -- untouched and the editor keeps working on its own scratch file.
@@ -1004,6 +1022,12 @@ local function setup_keymaps()
   -- From inside Claude (terminal mode): leave terminal mode, go to the editor.
   vim.keymap.set("t", config.to_editor_key, [[<C-\><C-n><Cmd>lua Kata.editor()<CR>]],
     { desc = "Kata: back to editor", silent = true })
+  -- Instruction / solution panes, from any mode (terminal mode needs the
+  -- extra <C-\><C-n> to leave the Claude terminal first).
+  vim.keymap.set({ "n", "i", "t" }, config.to_instr_key, [[<C-\><C-n><Cmd>lua Kata.instruction()<CR>]],
+    { desc = "Kata: to instruction pane", silent = true })
+  vim.keymap.set({ "n", "i", "t" }, config.to_solution_key, [[<C-\><C-n><Cmd>lua Kata.solution()<CR>]],
+    { desc = "Kata: to solution pane", silent = true })
 
   api.nvim_create_user_command("KataNext", M.next, {})
   api.nvim_create_user_command("KataPrev", M.prev, {})
@@ -1013,6 +1037,8 @@ local function setup_keymaps()
   api.nvim_create_user_command("KataReset", M.reset, {})
   api.nvim_create_user_command("KataClaude", M.claude, {})
   api.nvim_create_user_command("KataEditor", M.editor, {})
+  api.nvim_create_user_command("KataInstruction", M.instruction, {})
+  api.nvim_create_user_command("KataSolution", M.solution, {})
   api.nvim_create_user_command("KataCopy", function(o)
     M.copy(o.args)
   end, { nargs = "?", complete = "file" })
