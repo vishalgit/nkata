@@ -1,10 +1,12 @@
 #!/usr/bin/env bash
 # nkata — open a kata set in the 4-pane Neovim kata runner
 #
-# Usage: nkata <set-dir> [start-at]
-#   nkata ~/katas/org-basics          resume at the first unsolved kata
-#   nkata ~/katas/org-basics 2        start at kata #2
-#   nkata ~/katas/org-basics 003      start at the kata whose folder starts with 003
+# Usage: nkata <keyword|set-dir> [start-at]
+#   nkata gtd                         open the kata mapped to "gtd" in katas.conf
+#   nkata leptos 2                    start at kata #2
+#   nkata rust-tdd 003                start at the kata whose folder starts with 003
+#   nkata ~/katas/org-gtd             a plain directory path also works
+#   nkata --list                      list keywords
 #
 # Runs your kickstart profile (same as the `kvim` alias) — aliases aren't
 # visible inside scripts, so the env var is set here directly.
@@ -15,14 +17,37 @@ set -euo pipefail
 KATA_HOME="${NKATA_HOME:-$HOME/.config/nkata}"
 APPNAME="${NKATA_NVIM_APPNAME:-kickstart}"
 
+CONF="$KATA_HOME/katas.conf"
+
+# keyword -> folder lookup; prints the folder name, or nothing if unknown
+lookup() {
+  [[ -f "$CONF" ]] || return 0
+  awk -F= -v k="$1" '
+    /^[[:space:]]*(#|$)/ { next }
+    { key=$1; sub(/^[[:space:]]+/, "", key); sub(/[[:space:]]+$/, "", key)
+      val=$2; sub(/^[[:space:]]+/, "", val); sub(/[[:space:]]+$/, "", val)
+      if (key == k) { print val; exit } }' "$CONF"
+}
+
+if [[ "${1:-}" == "--list" ]]; then
+  grep -vE '^[[:space:]]*(#|$)' "$CONF" 2>/dev/null | sed -E 's/[[:space:]]*=[[:space:]]*/  ->  /'
+  exit 0
+fi
+
 if [[ $# -lt 1 || "$1" == "-h" || "$1" == "--help" ]]; then
-  sed -n '2,11p' "$0" | sed 's/^# \{0,1\}//'
+  sed -n '2,13p' "$0" | sed 's/^# \{0,1\}//'
   exit 0
 fi
 
 set_dir="$1"
 if [[ ! -d "$set_dir" ]]; then
-  echo "nkata: '$set_dir' is not a directory" >&2
+  folder="$(lookup "$1")"
+  if [[ -n "$folder" ]]; then
+    set_dir="${NKATA_KATAS:-$HOME/katas}/$folder"
+  fi
+fi
+if [[ ! -d "$set_dir" ]]; then
+  echo "nkata: '$1' is not a keyword or directory (try: nkata --list)" >&2
   exit 1
 fi
 if [[ ! -f "$KATA_HOME/kata.lua" ]]; then

@@ -57,7 +57,7 @@ export PATH="$HOME/.local/bin:$PATH"
 ## Usage
 
 ```bash
-nkata ~/katas/org-basics        # resume at the first unsolved kata
+nkata gtd                      # keyword from katas.conf; resume at the first unsolved kata
 nkata ~/katas/org-basics 2      # start at kata #2
 nkata ~/katas/org-basics 003    # start at the kata whose folder starts with 003
 nkata --help
