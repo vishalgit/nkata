@@ -1,0 +1,8 @@
+#+TITLE: Practice
+#+STARTUP: showall nologdone
+#+TODO: TODO(t) NEXT(n) WAITING(w) SOMEDAY(s) | DONE(d) CANCELLED(c)
+
+* TODO Fix the production outage
+* TODO Review the pull request
+* TODO Renew the passport
+* TODO Clean the downloads folder

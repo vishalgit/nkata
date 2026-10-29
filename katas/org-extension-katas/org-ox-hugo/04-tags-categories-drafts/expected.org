@@ -1,0 +1,19 @@
+#+TITLE: Practice
+#+STARTUP: showall nologdone
+#+TODO: TODO(t) NEXT(n) WAITING(w) SOMEDAY(s) | DONE(d) CANCELLED(c)
+
+* Blog
+:PROPERTIES:
+:EXPORT_HUGO_BASE_DIR: ~/site
+:EXPORT_HUGO_SECTION: posts
+:END:
+** My first post :orgmode:@guides:
+:PROPERTIES:
+:EXPORT_FILE_NAME: my-first-post
+:END:
+Hello world.
+** TODO Learning org mode :orgmode:tips:@guides:
+:PROPERTIES:
+:EXPORT_FILE_NAME: learning-org-mode
+:END:
+Notes about org mode.

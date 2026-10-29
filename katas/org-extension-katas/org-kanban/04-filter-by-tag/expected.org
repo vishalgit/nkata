@@ -1,0 +1,9 @@
+#+TITLE: Practice
+#+STARTUP: showall nologdone
+#+TODO: TODO(t) NEXT(n) WAITING(w) SOMEDAY(s) | DONE(d) CANCELLED(c)
+
+* NEXT Draft the proposal :work:
+* TODO Book the dentist :home:
+* WAITING Review the pull request :work:
+* NEXT Fix the squeaky door :home:
+* NEXT Send the invoice :work:

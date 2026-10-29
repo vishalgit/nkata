@@ -1,0 +1,8 @@
+#+TITLE: Practice
+#+STARTUP: showall nologdone
+#+TODO: TODO(t) NEXT(n) WAITING(w) SOMEDAY(s) | DONE(d) CANCELLED(c)
+#+PROPERTY: Effort_ALL 0:15 0:30 1:00 2:00 4:00
+
+* TODO Write the report
+* TODO Design the logo
+* TODO Launch the site

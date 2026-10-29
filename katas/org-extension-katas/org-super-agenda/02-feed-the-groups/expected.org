@@ -1,0 +1,10 @@
+#+TITLE: Practice
+#+STARTUP: showall nologdone
+#+TODO: TODO(t) NEXT(n) WAITING(w) SOMEDAY(s) | DONE(d) CANCELLED(c)
+
+* TODO [#A] Fix the production outage :work:
+DEADLINE: <2026-11-02 Mon>
+* TODO [#B] Review the pull request :work:
+* TODO Renew the passport :home:
+DEADLINE: <2026-12-15 Tue>
+* TODO [#C] Clean the downloads folder :home:

@@ -1,0 +1,14 @@
+#+TITLE: Practice
+#+STARTUP: showall nologdone
+#+TODO: TODO(t) NEXT(n) WAITING(w) SOMEDAY(s) | DONE(d) CANCELLED(c)
+
+* TODO Send the invoice
+DEADLINE: <2026-01-05 Mon>
+* TODO Book the venue
+DEADLINE: <2026-02-10 Tue>
+* TODO Plan the offsite
+DEADLINE: <2037-01-01 Thu>
+
+* Overdue tasks
+- Send the invoice
+- Book the venue

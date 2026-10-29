@@ -1,0 +1,9 @@
+#+TITLE: Practice
+#+STARTUP: showall nologdone
+#+TODO: TODO(t) NEXT(n) WAITING(w) SOMEDAY(s) | DONE(d) CANCELLED(c)
+
+* Blog
+** My first post
+Hello world.
+** Learning org mode
+Notes about org mode.

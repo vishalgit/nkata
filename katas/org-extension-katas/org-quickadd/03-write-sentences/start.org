@@ -1,0 +1,10 @@
+#+title: Quick add answers
+
+1. A task "Buy milk" with the tag home.
+Answer:
+
+2. A task "Call Bob" on Friday at 3pm, tag work, priority A.
+Answer:
+
+3. A task "Stretch" that takes 15 minutes.
+Answer:

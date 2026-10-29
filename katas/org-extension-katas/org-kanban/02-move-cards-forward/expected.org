@@ -1,0 +1,7 @@
+#+TITLE: Practice
+#+STARTUP: showall nologdone
+#+TODO: TODO(t) NEXT(n) WAITING(w) SOMEDAY(s) | DONE(d) CANCELLED(c)
+
+* NEXT Write the report
+* WAITING Call the dentist
+* TODO Pay the bill

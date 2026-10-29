@@ -1,0 +1,7 @@
+#+TITLE: Practice
+#+STARTUP: showall nologdone
+#+TODO: TODO(t) NEXT(n) WAITING(w) SOMEDAY(s) | DONE(d) CANCELLED(c)
+
+* NEXT Reply from the landlord
+* NEXT Learn the piano
+* TODO Fix the squeaky door

@@ -1,0 +1,8 @@
+:PROPERTIES:
+:ID:       4f1c2a10-0001-4a00-8000-000000000001
+:END:
+#+title: Org mode basics
+
+Org mode keeps notes, tasks and plans in plain text.
+
+See also:

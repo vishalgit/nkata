@@ -1,0 +1,5 @@
+return {
+  extensions = {
+    ql = true,
+  },
+}

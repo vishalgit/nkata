@@ -1,0 +1,7 @@
+:PROPERTIES:
+:ID:       4f1c2a10-0001-4a00-8000-000000000001
+:ROAM_ALIASES: "Org mode" Org
+:ROAM_REFS: https://orgmode.org
+:END:
+#+title: Org mode basics
+#+filetags: :notes:emacs:

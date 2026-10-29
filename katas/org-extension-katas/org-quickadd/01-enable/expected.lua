@@ -1,0 +1,5 @@
+return {
+  extensions = {
+    quickadd = true,
+  },
+}
