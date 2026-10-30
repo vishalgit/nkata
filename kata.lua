@@ -33,6 +33,8 @@ local config = {
   to_editor_key = "<M-e>", -- Claude pane (terminal mode) → back to the editor
   to_instr_key = "<M-i>", -- any pane → instruction pane
   to_solution_key = "<M-s>", -- any pane → solution (final result) pane
+  kill_pane_key = "<M-x>", -- any pane → close the focused pane (not the editor); the rest grow into its space
+  restore_key = "<M-r>", -- any pane → bring back every closed pane
   tmp_root = "/tmp/nkata",
   claude_cmd = "claude", -- override with the NKATA_CLAUDE_CMD env var
   notify_claude_on_switch = false, -- tell Claude when you move to another kata (costs a model turn)
@@ -52,6 +54,7 @@ local S = {
   idx = 1,
   win = {}, -- editor, result, instr, claude
   buf = {}, -- editor, result, instr, claude
+  killed = {}, -- pane names the user closed on purpose; they stay closed across kata switches
   want = {}, -- normalized expected lines
   passed = false,
   diff_count = 0,
@@ -250,8 +253,24 @@ local function placeholder(w)
   api.nvim_win_set_buf(w, ph)
 end
 
+-- Close a pane's window. Claude's terminal buffer is kept (and keeps running)
+-- so restoring the pane brings the same session back.
+local function close_pane(name)
+  local w = S.win[name]
+  S.win[name] = nil
+  if name == "claude" and buf_ok(S.buf.claude) then
+    vim.bo[S.buf.claude].bufhidden = "hide"
+  end
+  if win_ok(w) then
+    api.nvim_win_close(w, true)
+  end
+end
+
 local function build_layout()
   vim.cmd("silent! diffoff!")
+  if buf_ok(S.buf.claude) then
+    vim.bo[S.buf.claude].bufhidden = "hide"
+  end
   vim.cmd("silent! only!")
   local editor = api.nvim_get_current_win()
   vim.cmd("rightbelow vsplit")
@@ -272,11 +291,19 @@ local function build_layout()
     placeholder(claude)
   end
   S.win = { editor = editor, result = result, instr = instr, claude = claude }
+  for name in pairs(S.killed) do
+    close_pane(name)
+  end
   vim.cmd("wincmd =")
 end
 
 local function layout_ok()
-  return win_ok(S.win.editor) and win_ok(S.win.result) and win_ok(S.win.instr) and win_ok(S.win.claude)
+  for _, name in ipairs({ "editor", "result", "instr", "claude" }) do
+    if not (S.killed[name] or win_ok(S.win[name])) then
+      return false
+    end
+  end
+  return true
 end
 
 local function ensure_layout()
@@ -293,20 +320,26 @@ end
 
 local function apply_win_opts()
   for _, w in ipairs({ S.win.editor, S.win.result }) do
-    vim.wo[w].foldenable = false
-    vim.wo[w].conceallevel = 0 -- show the real text, markers and all
-    vim.wo[w].wrap = false
+    if win_ok(w) then
+      vim.wo[w].foldenable = false
+      vim.wo[w].conceallevel = 0 -- show the real text, markers and all
+      vim.wo[w].wrap = false
+    end
   end
   for _, w in ipairs({ S.win.instr, S.win.claude }) do
-    vim.wo[w].number = false
-    vim.wo[w].relativenumber = false
-    vim.wo[w].signcolumn = "no"
-    vim.wo[w].foldcolumn = "0"
-    vim.wo[w].cursorline = false
-    vim.wo[w].spell = false
+    if win_ok(w) then
+      vim.wo[w].number = false
+      vim.wo[w].relativenumber = false
+      vim.wo[w].signcolumn = "no"
+      vim.wo[w].foldcolumn = "0"
+      vim.wo[w].cursorline = false
+      vim.wo[w].spell = false
+    end
   end
-  vim.wo[S.win.instr].wrap = true
-  vim.wo[S.win.instr].linebreak = true
+  if win_ok(S.win.instr) then
+    vim.wo[S.win.instr].wrap = true
+    vim.wo[S.win.instr].linebreak = true
+  end
 end
 
 local function set_border(pass)
@@ -320,10 +353,12 @@ end
 
 local function setup_diff()
   vim.cmd("silent! diffoff!")
-  for _, w in ipairs({ S.win.editor, S.win.result }) do
-    api.nvim_win_call(w, function()
-      vim.cmd("diffthis")
-    end)
+  if win_ok(S.win.editor) and win_ok(S.win.result) then
+    for _, w in ipairs({ S.win.editor, S.win.result }) do
+      api.nvim_win_call(w, function()
+        vim.cmd("diffthis")
+      end)
+    end
   end
   apply_win_opts()
 end
@@ -432,7 +467,7 @@ local function ensure_claude()
     start_claude()
     return
   end
-  if buf_ok(S.buf.claude) and api.nvim_win_get_buf(S.win.claude) ~= S.buf.claude then
+  if win_ok(S.win.claude) and buf_ok(S.buf.claude) and api.nvim_win_get_buf(S.win.claude) ~= S.buf.claude then
     api.nvim_win_set_buf(S.win.claude, S.buf.claude)
   end
 end
@@ -523,6 +558,7 @@ local function render()
   add(string.format(" %sr reset   %sw copy to…   %sx run in shell", p, p, p), "KataDim")
   add(string.format(" %sc Claude   %se editor   %sq quit", p, p, p), "KataDim")
   add(string.format(" %s to Claude · %s back to editor", config.to_claude_key, config.to_editor_key), "KataDim")
+  add(string.format(" %s close pane · %s restore panes", config.kill_pane_key, config.restore_key), "KataDim")
 
   vim.bo[b].modifiable = true
   api.nvim_buf_set_lines(b, 0, -1, false, lines)
@@ -575,19 +611,21 @@ end
 
 -- ── Live reload when kata files change on disk ──────────────────────────
 local function refresh_from_disk(k)
-  if S.katas[S.idx] ~= k or not buf_ok(S.buf.result) then
+  if S.katas[S.idx] ~= k then
     return
   end
   if vim.fn.filereadable(k.expected) == 1 then
     local expected = read_lines(k.expected)
-    local shown = api.nvim_buf_get_lines(S.buf.result, 0, -1, false)
-    if not vim.deep_equal(expected, shown) then
-      vim.bo[S.buf.result].modifiable = true
-      api.nvim_buf_set_lines(S.buf.result, 0, -1, false, expected)
-      vim.bo[S.buf.result].modifiable = false
-      vim.bo[S.buf.result].modified = false
-      S.want = normalize(expected)
+    if buf_ok(S.buf.result) then
+      local shown = api.nvim_buf_get_lines(S.buf.result, 0, -1, false)
+      if not vim.deep_equal(expected, shown) then
+        vim.bo[S.buf.result].modifiable = true
+        api.nvim_buf_set_lines(S.buf.result, 0, -1, false, expected)
+        vim.bo[S.buf.result].modifiable = false
+        vim.bo[S.buf.result].modified = false
+      end
     end
+    S.want = normalize(expected)
   end
   write_current(k) -- e.g. a start.<ext> that now exists
   check() -- re-renders the instruction pane too
@@ -633,6 +671,31 @@ local function show_scratch(win, b, name, ft)
   vim.bo[b].modified = false
 end
 
+local function kata_ft(k)
+  return vim.filetype.match({ filename = k.expected }) or k.ext
+end
+
+-- Final result (pane 2) and instruction (pane 3); a closed pane is skipped.
+local function show_side_panes(k)
+  local expected = read_lines(k.expected)
+  S.want = normalize(expected)
+  if win_ok(S.win.result) then
+    local rb = api.nvim_create_buf(false, true)
+    api.nvim_buf_set_lines(rb, 0, -1, false, expected)
+    vim.bo[rb].bufhidden = "wipe"
+    vim.bo[rb].modifiable = false
+    show_scratch(S.win.result, rb, "kata://final-result/" .. k.name, kata_ft(k))
+    S.buf.result = rb
+  end
+  if win_ok(S.win.instr) then
+    local ib = api.nvim_create_buf(false, true)
+    vim.bo[ib].bufhidden = "wipe"
+    show_scratch(S.win.instr, ib, "kata://instruction/" .. k.name, "markdown")
+    vim.bo[ib].modifiable = false
+    S.buf.instr = ib
+  end
+end
+
 local function load_kata(idx, tell_claude)
   local k = S.katas[idx]
   if not k then
@@ -655,27 +718,12 @@ local function load_kata(idx, tell_claude)
   if buf_ok(old_editor) and old_editor ~= S.buf.editor then
     pcall(api.nvim_buf_delete, old_editor, { force = true })
   end
-  local ft = vim.filetype.match({ filename = k.expected }) or k.ext
   if vim.bo[S.buf.editor].filetype == "" then
-    vim.bo[S.buf.editor].filetype = ft
+    vim.bo[S.buf.editor].filetype = kata_ft(k)
   end
 
-  -- 2. Final result (read-only)
-  local expected = read_lines(k.expected)
-  S.want = normalize(expected)
-  local rb = api.nvim_create_buf(false, true)
-  api.nvim_buf_set_lines(rb, 0, -1, false, expected)
-  vim.bo[rb].bufhidden = "wipe"
-  vim.bo[rb].modifiable = false
-  show_scratch(S.win.result, rb, "kata://final-result/" .. k.name, ft)
-  S.buf.result = rb
-
-  -- 3. Instruction
-  local ib = api.nvim_create_buf(false, true)
-  vim.bo[ib].bufhidden = "wipe"
-  show_scratch(S.win.instr, ib, "kata://instruction/" .. k.name, "markdown")
-  vim.bo[ib].modifiable = false
-  S.buf.instr = ib
+  -- 2 + 3. Final result (read-only) and instruction
+  show_side_panes(k)
 
   -- 4. Claude: point it at this kata; start it on first load
   write_current(k)
@@ -763,8 +811,19 @@ function M.reset()
 end
 
 -- Focus the Claude pane in insert mode, restarting Claude if it has exited.
+local function pane_closed(name, label)
+  if S.killed[name] then
+    notify(string.format("%s pane is closed — %s to restore", label, config.restore_key))
+    return true
+  end
+  return false
+end
+
 function M.claude()
   ensure_layout()
+  if pane_closed("claude", "Claude") then
+    return
+  end
   if not claude_alive() then
     start_claude()
   end
@@ -786,6 +845,9 @@ end
 -- Focus the instruction pane.
 function M.instruction()
   ensure_layout()
+  if pane_closed("instr", "Instruction") then
+    return
+  end
   if win_ok(S.win.instr) then
     api.nvim_set_current_win(S.win.instr)
   end
@@ -794,9 +856,66 @@ end
 -- Focus the solution (final result) pane.
 function M.solution()
   ensure_layout()
+  if pane_closed("result", "Solution") then
+    return
+  end
   if win_ok(S.win.result) then
     api.nvim_set_current_win(S.win.result)
   end
+end
+
+-- Close the focused pane (never the editor) so its neighbours grow into the
+-- space. It stays closed across kata switches until M.restore_layout().
+function M.kill_pane()
+  local cur = api.nvim_get_current_win()
+  local name
+  for n, w in pairs(S.win) do
+    if w == cur then
+      name = n
+    end
+  end
+  if not name then
+    notify("Not in a kata pane", vim.log.levels.WARN)
+    return
+  end
+  if name == "editor" then
+    notify("The editor pane can't be closed", vim.log.levels.WARN)
+    return
+  end
+  S.killed[name] = true
+  close_pane(name)
+  if name == "result" then
+    S.buf.result = nil
+    vim.cmd("silent! diffoff!")
+  elseif name == "instr" then
+    S.buf.instr = nil
+  end
+  equalize()
+  M.editor()
+end
+
+-- Bring back every closed pane. The editor text is untouched, Claude's
+-- session returns as it was, and panes 2 and 3 are refilled for this kata.
+function M.restore_layout()
+  if next(S.killed) == nil then
+    notify("All panes are already open")
+    return
+  end
+  S.killed = {}
+  if win_ok(S.win.editor) then
+    api.nvim_set_current_win(S.win.editor)
+  end
+  build_layout()
+  local k = S.katas[S.idx]
+  if k then
+    show_side_panes(k)
+  end
+  ensure_claude()
+  setup_diff()
+  set_border(S.passed)
+  check()
+  equalize()
+  api.nvim_set_current_win(S.win.editor)
 end
 
 -- Write a copy of the editor pane's current text to a path you type in.
@@ -1053,6 +1172,13 @@ local function setup_keymaps()
   vim.keymap.set({ "n", "i", "t" }, config.to_solution_key, [[<C-\><C-n><Cmd>lua Kata.solution()<CR>]],
     { desc = "Kata: to solution pane", silent = true })
 
+  vim.keymap.set({ "n", "i", "t" }, config.kill_pane_key, [[<C-\><C-n><Cmd>lua Kata.kill_pane()<CR>]],
+    { desc = "Kata: close focused pane", silent = true })
+  vim.keymap.set({ "n", "i", "t" }, config.restore_key, [[<C-\><C-n><Cmd>lua Kata.restore_layout()<CR>]],
+    { desc = "Kata: restore closed panes", silent = true })
+
+  api.nvim_create_user_command("KataKill", M.kill_pane, {})
+  api.nvim_create_user_command("KataRestore", M.restore_layout, {})
   api.nvim_create_user_command("KataNext", M.next, {})
   api.nvim_create_user_command("KataPrev", M.prev, {})
   api.nvim_create_user_command("KataGoto", function(o)
