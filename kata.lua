@@ -29,12 +29,11 @@ local M = {}
 -- ── Config ──────────────────────────────────────────────────────────────
 local config = {
   prefix = "<leader>k", -- next = n, prev = p, goto = g, reset = r, copy = w, run = x, claude = c, editor = e, quit = q
-  to_claude_key = "<M-c>", -- editor (normal/insert) → Claude pane in insert mode
-  to_editor_key = "<M-e>", -- Claude pane (terminal mode) → back to the editor
+  nav_keys = { h = "<M-h>", j = "<M-j>", k = "<M-k>", l = "<M-l>" }, -- any pane → neighbouring pane, like vim's <C-w>hjkl
   to_instr_key = "<M-i>", -- any pane → instruction pane
   to_solution_key = "<M-s>", -- any pane → solution (final result) pane
-  kill_pane_key = "<M-x>", -- any pane → close the focused pane (not the editor); the rest grow into its space
-  restore_key = "<M-r>", -- any pane → bring back every closed pane
+  kill_pane_key = "<M-y>", -- any pane → close the focused pane (not the editor); the rest grow into its space
+  restore_key = "<M-u>", -- any pane → bring back every closed pane
   tmp_root = "/tmp/nkata",
   claude_cmd = "claude", -- override with the NKATA_CLAUDE_CMD env var
   notify_claude_on_switch = false, -- tell Claude when you move to another kata (costs a model turn)
@@ -557,7 +556,7 @@ local function render()
   add(string.format(" %sn next   %sp previous   %sg go to", p, p, p), "KataDim")
   add(string.format(" %sr reset   %sw copy to…   %sx run in shell", p, p, p), "KataDim")
   add(string.format(" %sc Claude   %se editor   %sq quit", p, p, p), "KataDim")
-  add(string.format(" %s to Claude · %s back to editor", config.to_claude_key, config.to_editor_key), "KataDim")
+  add(" <M-h/j/k/l> move between panes", "KataDim")
   add(string.format(" %s close pane · %s restore panes", config.kill_pane_key, config.restore_key), "KataDim")
 
   vim.bo[b].modifiable = true
@@ -1159,12 +1158,17 @@ local function setup_keymaps()
   end, { desc = "Kata: run selection/line in the shell", silent = true })
 
   -- Quick hops that don't need <leader>, so they also work mid-typing.
-  -- From the editor (normal or insert mode): into Claude, ready to type.
-  vim.keymap.set({ "n", "i" }, config.to_claude_key, "<Cmd>lua Kata.claude()<CR>",
-    { desc = "Kata: to Claude", silent = true })
-  -- From inside Claude (terminal mode): leave terminal mode, go to the editor.
-  vim.keymap.set("t", config.to_editor_key, [[<C-\><C-n><Cmd>lua Kata.editor()<CR>]],
-    { desc = "Kata: back to editor", silent = true })
+  -- Vim-style pane movement from any mode. Landing in the Claude terminal
+  -- resumes typing; leaving it needs <C-\\><C-n> first.
+  for dir, key in pairs(config.nav_keys) do
+    vim.keymap.set({ "n", "i", "t" }, key, function()
+      vim.cmd("stopinsert")
+      vim.cmd("wincmd " .. dir)
+      if vim.bo.buftype == "terminal" then
+        vim.cmd("startinsert")
+      end
+    end, { desc = "Kata: move to the " .. dir .. " pane", silent = true })
+  end
   -- Instruction / solution panes, from any mode (terminal mode needs the
   -- extra <C-\><C-n> to leave the Claude terminal first).
   vim.keymap.set({ "n", "i", "t" }, config.to_instr_key, [[<C-\><C-n><Cmd>lua Kata.instruction()<CR>]],
