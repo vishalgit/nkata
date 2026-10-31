@@ -79,8 +79,8 @@ nkata --help
 | `<M-h>` `<M-j>` `<M-k>` `<M-l>` | From any pane: move left / down / up / right, like vim's `<C-w>hjkl` (landing in Claude resumes typing) |
 | `<M-i>` | From any pane: jump to the instruction pane |
 | `<M-s>` | From any pane: jump to the solution (final result) pane |
-| `<M-y>` | From any pane: close the focused pane (not the editor); the others grow into its space |
-| `<M-u>` | From any pane: restore every closed pane |
+| `<M-x>` | From any pane: close the focused pane (not the editor); the others grow into its space |
+| `<M-r>` | From any pane: restore every closed pane |
 
 The same actions exist as commands: `:KataNext`, `:KataPrev`, `:KataGoto [n]`,
 `:KataReset`, `:KataCopy [path]`, `:KataRun [cmd]`, `:KataClaude`, `:KataEditor`,
@@ -88,8 +88,8 @@ The same actions exist as commands: `:KataNext`, `:KataPrev`, `:KataGoto [n]`,
 
 ### Closing and restoring panes
 
-`<M-y>` closes the focused pane so the remaining panes grow into the space.
-A closed pane stays closed when you move between katas; only `<M-u>` brings
+`<M-x>` closes the focused pane so the remaining panes grow into the space.
+A closed pane stays closed when you move between katas; only `<M-r>` brings
 it back, refilled for the current kata.
 
 - The editor pane can't be closed.
@@ -198,7 +198,7 @@ A kata set is any folder of kata folders. They run in folder-name order.
 | Clear Claude on kata switch | `clear_claude_on_switch` in `kata.lua` | on |
 | Keymap prefix | `prefix` at the top of `kata.lua` | `<leader>k` |
 | Pane-hop keys | `nav_keys` / `to_instr_key` / `to_solution_key` in `kata.lua` | `<M-h/j/k/l>` / `<M-i>` / `<M-s>` |
-| Close / restore pane keys | `kill_pane_key` / `restore_key` in `kata.lua` | `<M-y>` / `<M-u>` |
+| Close / restore pane keys | `kill_pane_key` / `restore_key` in `kata.lua` | `<M-x>` / `<M-r>` |
 | Scratch file folder | `tmp_root` at the top of `kata.lua` | `/tmp/nkata` |
 | Pass/fail colours | `pass_color` / `fail_color` in `kata.lua` | green / red |
 

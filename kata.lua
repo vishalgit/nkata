@@ -32,8 +32,8 @@ local config = {
   nav_keys = { h = "<M-h>", j = "<M-j>", k = "<M-k>", l = "<M-l>" }, -- any pane → neighbouring pane, like vim's <C-w>hjkl
   to_instr_key = "<M-i>", -- any pane → instruction pane
   to_solution_key = "<M-s>", -- any pane → solution (final result) pane
-  kill_pane_key = "<M-y>", -- any pane → close the focused pane (not the editor); the rest grow into its space
-  restore_key = "<M-u>", -- any pane → bring back every closed pane
+  kill_pane_key = "<M-x>", -- any pane → close the focused pane (not the editor); the rest grow into its space
+  restore_key = "<M-r>", -- any pane → bring back every closed pane
   tmp_root = "/tmp/nkata",
   claude_cmd = "claude", -- override with the NKATA_CLAUDE_CMD env var
   notify_claude_on_switch = false, -- tell Claude when you move to another kata (costs a model turn)
