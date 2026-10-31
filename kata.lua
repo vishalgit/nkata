@@ -32,7 +32,7 @@ local config = {
   nav_keys = { h = "<M-h>", j = "<M-j>", k = "<M-k>", l = "<M-l>" }, -- any pane → neighbouring pane, like vim's <C-w>hjkl
   to_instr_key = "<M-i>", -- any pane → instruction pane
   to_solution_key = "<M-s>", -- any pane → solution (final result) pane
-  kill_pane_key = "<M-x>", -- any pane → close the focused pane (not the editor); the rest grow into its space
+  kill_pane_key = "<M-x>", -- any pane → close the focused pane; the rest grow into its space
   restore_key = "<M-r>", -- any pane → bring back every closed pane
   tmp_root = "/tmp/nkata",
   claude_cmd = "claude", -- override with the NKATA_CLAUDE_CMD env var
@@ -863,7 +863,7 @@ function M.solution()
   end
 end
 
--- Close the focused pane (never the editor) so its neighbours grow into the
+-- Close the focused pane so its neighbours grow into the
 -- space. It stays closed across kata switches until M.restore_layout().
 function M.kill_pane()
   local cur = api.nvim_get_current_win()
@@ -875,10 +875,6 @@ function M.kill_pane()
   end
   if not name then
     notify("Not in a kata pane", vim.log.levels.WARN)
-    return
-  end
-  if name == "editor" then
-    notify("The editor pane can't be closed", vim.log.levels.WARN)
     return
   end
   S.killed[name] = true
@@ -914,7 +910,7 @@ function M.restore_layout()
   set_border(S.passed)
   check()
   equalize()
-  api.nvim_set_current_win(S.win.editor)
+  M.editor()
 end
 
 -- Write a copy of the editor pane's current text to a path you type in.

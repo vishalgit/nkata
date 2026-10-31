@@ -79,7 +79,7 @@ nkata --help
 | `<M-h>` `<M-j>` `<M-k>` `<M-l>` | From any pane: move left / down / up / right, like vim's `<C-w>hjkl` (landing in Claude resumes typing) |
 | `<M-i>` | From any pane: jump to the instruction pane |
 | `<M-s>` | From any pane: jump to the solution (final result) pane |
-| `<M-x>` | From any pane: close the focused pane (not the editor); the others grow into its space |
+| `<M-x>` | From any pane: close the focused pane; the others grow into its space |
 | `<M-r>` | From any pane: restore every closed pane |
 
 The same actions exist as commands: `:KataNext`, `:KataPrev`, `:KataGoto [n]`,
@@ -92,7 +92,6 @@ The same actions exist as commands: `:KataNext`, `:KataPrev`, `:KataGoto [n]`,
 A closed pane stays closed when you move between katas; only `<M-r>` brings
 it back, refilled for the current kata.
 
-- The editor pane can't be closed.
 - Closing the Claude pane only hides it. The session keeps running, and
   restoring shows the same conversation.
 - Your editor text is untouched by closing and restoring.
